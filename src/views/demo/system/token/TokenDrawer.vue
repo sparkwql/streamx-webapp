@@ -1,0 +1,66 @@
+<template>
+  <BasicDrawer
+    v-bind="$attrs"
+    @register="registerDrawer"
+    showFooter
+    :title="getTitle"
+    width="50%"
+    @ok="handleSubmit"
+  >
+    <BasicForm @register="registerForm" />
+  </BasicDrawer>
+</template>
+<script lang="ts">
+  import { defineComponent, ref, computed, unref } from 'vue';
+  import { BasicForm, useForm } from '/@/components/Form/index';
+  import { formSchema } from './token.data';
+  import { BasicDrawer, useDrawerInner } from '/@/components/Drawer';
+
+  import { addToken } from '/@/api/sys/token';
+
+  export default defineComponent({
+    name: 'MenuDrawer',
+    components: { BasicDrawer, BasicForm },
+    emits: ['success', 'register'],
+    setup(_, { emit }) {
+      const isUpdate = ref(true);
+
+      console.log(this);
+
+      const [registerForm, { resetFields, setFieldsValue, validate }] = useForm({
+        labelWidth: 100,
+        schemas: formSchema,
+        showActionButtonGroup: false,
+        baseColProps: { lg: 22, md: 22 },
+      });
+
+      const [registerDrawer, { setDrawerProps, closeDrawer }] = useDrawerInner(async (data) => {
+        resetFields();
+        setDrawerProps({ confirmLoading: false });
+        isUpdate.value = !!data?.isUpdate;
+
+        if (unref(isUpdate)) {
+          setFieldsValue({
+            ...data.record,
+          });
+        }
+      });
+
+      const getTitle = computed(() => (!unref(isUpdate) ? 'Add Token' : 'Edit Token'));
+
+      async function handleSubmit() {
+        try {
+          const values = await validate();
+          setDrawerProps({ confirmLoading: true });
+          await addToken(values);
+          closeDrawer();
+          emit('success');
+        } finally {
+          setDrawerProps({ confirmLoading: false });
+        }
+      }
+
+      return { registerDrawer, registerForm, getTitle, handleSubmit };
+    },
+  });
+</script>

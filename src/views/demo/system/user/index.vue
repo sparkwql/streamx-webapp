@@ -1,22 +1,28 @@
 <template>
   <div>
-    <BasicTable @register="registerTable" @fetch-success="onFetchSuccess">
+    <BasicTable @register="registerTable">
       <template #toolbar>
-        <a-button type="primary" @click="handleCreate"> Add Menu </a-button>
+        <a-button type="primary" @click="handleCreate"> Add User </a-button>
       </template>
       <template #action="{ record }">
         <TableAction
           :actions="[
             {
               icon: 'clarity:note-edit-line',
+              tooltip: 'modify',
               onClick: handleEdit.bind(null, record),
+            },
+            {
+              icon: 'clarity:info-standard-line',
+              tooltip: 'view detail',
+              onClick: handleView.bind(null, record),
             },
             {
               icon: 'ant-design:delete-outlined',
               color: 'error',
+              tooltip: 'reset password',
               popConfirm: {
-                title: '是否确认删除',
-                placement: 'left',
+                title: 'reset password, are you sure',
                 confirm: handleDelete.bind(null, record),
               },
             },
@@ -28,39 +34,40 @@
   </div>
 </template>
 <script lang="ts">
-  import { defineComponent, nextTick } from 'vue';
+  import { defineComponent } from 'vue';
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
-  import { getMenuList } from '/@/api/demo/system';
-
-  import { useDrawer } from '/@/components/Drawer';
   import MenuDrawer from './MenuDrawer.vue';
-
-  import { columns, searchFormSchema } from './menu.data';
+  import { useDrawer } from '/@/components/Drawer';
+  import { deleteUser, getUserList } from '/@/api/sys/user';
+  import { columns, searchFormSchema } from './user.data';
+  import { useMessage } from '/@/hooks/web/useMessage';
 
   export default defineComponent({
-    name: 'MenuManagement',
+    name: 'User',
     components: { BasicTable, MenuDrawer, TableAction },
     setup() {
       const [registerDrawer, { openDrawer }] = useDrawer();
-      const [registerTable, { reload, expandAll }] = useTable({
-        title: '菜单列表',
-        api: getMenuList,
+      const { notification } = useMessage();
+      const [registerTable, { reload, updateTableDataRecord }] = useTable({
+        title: 'User List',
+        api: getUserList,
         columns,
         formConfig: {
           labelWidth: 120,
           schemas: searchFormSchema,
         },
+        rowKey: 'userId',
         isTreeTable: true,
-        pagination: false,
+        pagination: true,
         striped: false,
         useSearchForm: true,
         showTableSetting: true,
-        bordered: true,
+        bordered: false,
         showIndexColumn: false,
         canResize: false,
         actionColumn: {
-          width: 80,
+          width: 120,
           title: 'Operation',
           dataIndex: 'action',
           slots: { customRender: 'action' },
@@ -81,17 +88,23 @@
         });
       }
 
-      function handleDelete(record: Recordable) {
+      // see detail
+      function handleView(record: Recordable) {
         console.log(record);
       }
 
-      function handleSuccess() {
-        reload();
+      // delete current user
+      function handleDelete(record: Recordable) {
+        deleteUser({ userId: record.userId });
       }
 
-      function onFetchSuccess() {
-        // 演示默认展开所有表项
-        nextTick(expandAll);
+      // add/edit user success
+      function handleSuccess({ isUpdate, values }) {
+        notification.success({
+          message: 'Tip',
+          description: 'Success',
+        });
+        isUpdate ? updateTableDataRecord(values.userId, values) : reload();
       }
 
       return {
@@ -101,7 +114,7 @@
         handleEdit,
         handleDelete,
         handleSuccess,
-        onFetchSuccess,
+        handleView,
       };
     },
   });

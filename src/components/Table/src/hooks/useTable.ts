@@ -38,6 +38,7 @@ export function useTable(tableProps?: Props): [
     tableRef.value = instance;
     formRef.value = formInstance;
     tableProps && instance.setProps(getDynamicProps(tableProps));
+    console.log(instance);
     loadedRef.value = true;
 
     stopWatch?.();
@@ -45,6 +46,7 @@ export function useTable(tableProps?: Props): [
     stopWatch = watch(
       () => tableProps,
       () => {
+        console.log(tableProps);
         tableProps && instance.setProps(getDynamicProps(tableProps));
       },
       {

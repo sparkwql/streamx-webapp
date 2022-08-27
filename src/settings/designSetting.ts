@@ -1,12 +1,12 @@
 import { ThemeEnum } from '../enums/appEnum';
 
-export const prefixCls = 'vben';
+export const prefixCls = 'streampark';
 
 export const darkMode = ThemeEnum.LIGHT;
 
 // app theme preset color
 export const APP_PRESET_COLOR_LIST: string[] = [
-  '#0960bd',
+  '#1890ff',
   '#0084f4',
   '#009688',
   '#536dfe',

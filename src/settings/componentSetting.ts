@@ -13,7 +13,7 @@ export default {
       // The number field name of each page displayed in the background
       sizeField: 'pageSize',
       // Field name of the form data returned by the interface
-      listField: 'items',
+      listField: 'records',
       // Total number of tables returned by the interface field name
       totalField: 'total',
     },
@@ -29,9 +29,9 @@ export default {
       if (field && order) {
         return {
           // The sort field passed to the backend you
-          field,
+          sortField: field,
           // Sorting method passed to the background asc/desc
-          order,
+          sortOrder: order === 'ascend' ? 'asc' : 'desc',
         };
       } else {
         return {};

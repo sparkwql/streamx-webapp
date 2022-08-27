@@ -20,6 +20,12 @@ export type DeptParams = {
 export type MenuParams = {
   menuName?: string;
   status?: string;
+  roleId?: number;
+};
+
+export type UserParams = {
+  pageNum?: number;
+  pageSize?: number;
 };
 
 export interface AccountListItem {
@@ -41,7 +47,22 @@ export interface DeptListItem {
   status: number;
 }
 
+export interface TreeItem {
+  children: number[];
+}
+
 export interface MenuListItem {
+  id: string;
+  orderNo: string;
+  createTime: string;
+  status: number;
+  icon: string;
+  component: string;
+  permission: string;
+  rows: TreeItem;
+}
+
+export interface UserListItem {
   id: string;
   orderNo: string;
   createTime: string;
@@ -68,6 +89,8 @@ export type AccountListGetResultModel = BasicFetchResult<AccountListItem>;
 export type DeptListGetResultModel = BasicFetchResult<DeptListItem>;
 
 export type MenuListGetResultModel = BasicFetchResult<MenuListItem>;
+
+export type UserListGetResultModel = BasicFetchResult<UserListItem>;
 
 export type RolePageListGetResultModel = BasicFetchResult<RoleListItem>;
 

@@ -6,13 +6,13 @@ import { Icon } from '/@/components/Icon';
 
 export const columns: BasicColumn[] = [
   {
-    title: '菜单名称',
-    dataIndex: 'menuName',
+    title: 'Name',
+    dataIndex: 'text',
     width: 200,
     align: 'left',
   },
   {
-    title: '图标',
+    title: 'Icon',
     dataIndex: 'icon',
     width: 50,
     customRender: ({ record }) => {
@@ -20,35 +20,38 @@ export const columns: BasicColumn[] = [
     },
   },
   {
-    title: '权限标识',
-    dataIndex: 'permission',
-    width: 180,
-  },
-  {
-    title: '组件',
-    dataIndex: 'component',
-  },
-  {
-    title: '排序',
-    dataIndex: 'orderNo',
-    width: 50,
-  },
-  {
-    title: '状态',
-    dataIndex: 'status',
-    width: 80,
+    title: 'Type',
+    dataIndex: 'type',
     customRender: ({ record }) => {
-      const status = record.status;
-      const enable = ~~status === 0;
-      const color = enable ? 'green' : 'red';
-      const text = enable ? '启用' : '停用';
-      return h(Tag, { color: color }, () => text);
+      return h(Tag, {
+        color: record.type === '0' ? 'cyan' : 'pink',
+        value: record.type === '0' ? '菜单' : '按钮',
+      });
     },
   },
   {
-    title: '创建时间',
+    title: 'Path',
+    dataIndex: 'path',
+  },
+  {
+    title: 'Vue Component',
+    dataIndex: 'component',
+  },
+  {
+    title: 'Permission',
+    dataIndex: 'permission',
+  },
+  {
+    title: 'Order By',
+    dataIndex: 'order',
+  },
+  {
+    title: 'Create Time',
     dataIndex: 'createTime',
-    width: 180,
+  },
+  {
+    title: 'Modify Time',
+    dataIndex: 'modifyTime',
   },
 ];
 
