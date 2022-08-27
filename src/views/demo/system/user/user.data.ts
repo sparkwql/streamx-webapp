@@ -2,7 +2,7 @@ import { BasicColumn, FormSchema } from '/@/components/Table';
 import { h } from 'vue';
 import { Tag } from 'ant-design-vue';
 import { getRoleListByUser } from '/@/api/sys/role';
-import { getTeamList } from '/@/api/sys/team';
+import { getTeamListByUser } from '/@/api/sys/team';
 
 // user status enum
 const enum StatusEnum {
@@ -51,7 +51,7 @@ export const searchFormSchema: FormSchema[] = [
     field: 'teamId',
     component: 'ApiSelect',
     componentProps: {
-      api: getTeamList,
+      api: getTeamListByUser,
       resultField: 'records',
       labelField: 'teamName',
       valueField: 'teamId',
@@ -126,7 +126,7 @@ export const formSchema = (isUpdate = false): FormSchema[] => {
       field: 'teamId',
       component: 'ApiSelect',
       componentProps: {
-        api: getTeamList,
+        api: getTeamListByUser,
         resultField: 'records',
         labelField: 'teamName',
         valueField: 'teamId',

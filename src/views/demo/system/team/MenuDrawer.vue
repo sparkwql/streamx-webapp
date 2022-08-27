@@ -13,10 +13,10 @@
 <script lang="ts">
   import { defineComponent, ref, computed, unref } from 'vue';
   import { BasicForm, useForm } from '/@/components/Form/index';
-  import { editFormSchema, formSchema } from './user.data';
+  import { formSchema } from './team.data';
   import { BasicDrawer, useDrawerInner } from '/@/components/Drawer';
 
-  import { getMenuList } from '/@/api/demo/system';
+  import { addTeam } from '/@/api/sys/team';
 
   export default defineComponent({
     name: 'MenuDrawer',
@@ -25,14 +25,11 @@
     setup(_, { emit }) {
       const isUpdate = ref(true);
 
-      console.log(this);
-
-      const [registerForm, { resetFields, setFieldsValue, updateSchema, validate }] = useForm({
-        labelWidth: 100,
-        isUpdate: unref(isUpdate),
+      const [registerForm, { resetFields, setFieldsValue, validate }] = useForm({
+        labelWidth: 120,
         schemas: formSchema,
         showActionButtonGroup: false,
-        baseColProps: { lg: 24, md: 24 },
+        baseColProps: { lg: 22, md: 22 },
       });
 
       const [registerDrawer, { setDrawerProps, closeDrawer }] = useDrawerInner(async (data) => {
@@ -45,11 +42,6 @@
             ...data.record,
           });
         }
-        const treeData = await getMenuList();
-        updateSchema({
-          field: 'parentMenu',
-          componentProps: { treeData },
-        });
       });
 
       const getTitle = computed(() => (!unref(isUpdate) ? 'Add User' : 'Edit User'));
@@ -58,8 +50,7 @@
         try {
           const values = await validate();
           setDrawerProps({ confirmLoading: true });
-          // TODO custom api
-          console.log(values);
+          addTeam(values);
           closeDrawer();
           emit('success');
         } finally {

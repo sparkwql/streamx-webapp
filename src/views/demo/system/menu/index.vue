@@ -11,15 +11,6 @@
               icon: 'clarity:note-edit-line',
               onClick: handleEdit.bind(null, record),
             },
-            {
-              icon: 'ant-design:delete-outlined',
-              color: 'error',
-              popConfirm: {
-                title: '是否确认删除',
-                placement: 'left',
-                confirm: handleDelete.bind(null, record),
-              },
-            },
           ]"
         />
       </template>
@@ -51,6 +42,9 @@
           labelWidth: 120,
           schemas: searchFormSchema,
         },
+        fetchSetting: {
+          listField: 'rows.children',
+        },
         isTreeTable: true,
         pagination: false,
         striped: false,
@@ -60,7 +54,7 @@
         showIndexColumn: false,
         canResize: false,
         actionColumn: {
-          width: 80,
+          width: 100,
           title: 'Operation',
           dataIndex: 'action',
           slots: { customRender: 'action' },
@@ -81,10 +75,6 @@
         });
       }
 
-      function handleDelete(record: Recordable) {
-        console.log(record);
-      }
-
       function handleSuccess() {
         reload();
       }
@@ -99,7 +89,6 @@
         registerDrawer,
         handleCreate,
         handleEdit,
-        handleDelete,
         handleSuccess,
         onFetchSuccess,
       };

@@ -2,27 +2,17 @@
   <div>
     <BasicTable @register="registerTable" @fetch-success="onFetchSuccess">
       <template #toolbar>
-        <a-button type="primary" @click="handleCreate"> 新增用户 </a-button>
+        <a-button type="primary" @click="handleCreate"> Add Team </a-button>
       </template>
       <template #action="{ record }">
         <TableAction
           :actions="[
             {
-              icon: 'clarity:note-edit-line',
-              tooltip: 'modify',
-              onClick: handleEdit.bind(null, record),
-            },
-            {
-              icon: 'clarity:info-standard-line',
-              tooltip: 'view detail',
-              onClick: handleView.bind(null, record),
-            },
-            {
               icon: 'ant-design:delete-outlined',
               color: 'error',
-              tooltip: 'reset password',
+              tooltip: 'delete Team',
               popConfirm: {
-                title: 'reset password, are you sure',
+                title: 'delete Team, are you sure',
                 confirm: handleDelete.bind(null, record),
               },
             },
@@ -39,17 +29,19 @@
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import MenuDrawer from './MenuDrawer.vue';
   import { useDrawer } from '/@/components/Drawer';
-  import { getUserList } from '/@/api/sys/user';
   import { columns, searchFormSchema } from './team.data';
+  import { getTeamList, deleteTeam } from '/@/api/sys/team';
+  import { useMessage } from '/@/hooks/web/useMessage';
 
   export default defineComponent({
     name: 'User',
     components: { BasicTable, MenuDrawer, TableAction },
     setup() {
       const [registerDrawer, { openDrawer }] = useDrawer();
-      const [registerTable, { reload, expandAll, updateTableDataRecord }] = useTable({
-        title: '用户列表',
-        api: getUserList,
+      const { createMessage } = useMessage();
+      const [registerTable, { reload, expandAll }] = useTable({
+        title: 'Team List',
+        api: getTeamList,
         columns,
         formConfig: {
           labelWidth: 120,
@@ -91,22 +83,18 @@
       }
 
       function handleDelete(record: Recordable) {
-        console.log(record);
-      }
-
-      function handleSuccess({ isUpdate, values }) {
-        if (isUpdate) {
-          // 演示不刷新表格直接更新内部数据。
-          // 注意：updateTableDataRecord要求表格的rowKey属性为string并且存在于每一行的record的keys中
-          const result = updateTableDataRecord(values.id, values);
-          console.log(result);
-        } else {
+        deleteTeam({ teamId: record.teamId }).then((_) => {
+          createMessage.success('delete successful');
           reload();
-        }
+        });
       }
 
-      function onFetchSuccess(res) {
-        console.log(res);
+      function handleSuccess() {
+        createMessage.success('add successful');
+        reload();
+      }
+
+      function onFetchSuccess() {
         // 演示默认展开所有表项
         nextTick(expandAll);
       }
