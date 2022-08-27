@@ -13,6 +13,8 @@ const LayoutMap = new Map<string, () => Promise<typeof import('*.vue')>>();
 
 LayoutMap.set('LAYOUT', LAYOUT);
 LayoutMap.set('IFRAME', IFRAME);
+LayoutMap.set('PAGEVIEW', LAYOUT);
+LayoutMap.set('BASICVIEW', LAYOUT);
 
 let dynamicViewsModules: Record<string, () => Promise<Recordable>>;
 
@@ -28,11 +30,7 @@ function asyncImportRoute(routes: AppRouteRecordRaw[] | undefined) {
     const { children } = item;
     if (component) {
       const layoutFound = LayoutMap.get(component.toUpperCase());
-      if (layoutFound) {
-        item.component = layoutFound;
-      } else {
-        item.component = dynamicImport(dynamicViewsModules, component as string);
-      }
+      item.component = layoutFound || dynamicImport(dynamicViewsModules, component as string);
     } else if (name) {
       item.component = getParentLayout();
     }
@@ -73,12 +71,12 @@ export function transformObjToRoute<T = AppRouteModule>(routeList: AppRouteModul
   routeList.forEach((route) => {
     const component = route.component as string;
     if (component) {
-      if (component.toUpperCase() === 'LAYOUT') {
+      if (LayoutMap.has(component.toUpperCase())) {
         route.component = LayoutMap.get(component.toUpperCase());
       } else {
         route.children = [cloneDeep(route)];
         route.component = LAYOUT;
-        route.name = `${route.name}Parent`;
+        route.name = `${route.name}`;
         route.path = '';
         const meta = route.meta || {};
         meta.single = true;

@@ -43,8 +43,8 @@
       const { t } = useI18n();
 
       const getTitle = computed(() => {
-        const { tabItem: { meta } = {} } = props;
-        return meta && t(meta.title as string);
+        const { tabItem: { meta, name } = {} } = props;
+        return t((name || meta?.title) as string);
       });
 
       const getIsTabs = computed(() => !props.isExtra);

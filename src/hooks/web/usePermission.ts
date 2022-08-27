@@ -7,15 +7,14 @@ import { useUserStore } from '/@/store/modules/user';
 import { useTabs } from './useTabs';
 
 import { router, resetRouter } from '/@/router';
-// import { RootRoute } from '/@/router/routes';
 
 import projectSetting from '/@/settings/projectSetting';
-import { PermissionModeEnum } from '/@/enums/appEnum';
+import { AuthUserName, PermissionModeEnum } from '/@/enums/appEnum';
 import { RoleEnum } from '/@/enums/roleEnum';
 
-import { intersection } from 'lodash-es';
 import { isArray } from '/@/utils/is';
 import { useMultipleTabStore } from '/@/store/modules/multipleTab';
+import { intersection } from 'lodash-es';
 
 // User permissions related operations
 export function usePermission() {
@@ -59,7 +58,7 @@ export function usePermission() {
    */
   function hasPermission(value?: RoleEnum | RoleEnum[] | string | string[], def = true): boolean {
     // Visible by default
-    if (!value) {
+    if (!value || userStore.getUserInfo?.username === AuthUserName.ADMIN) {
       return def;
     }
 
@@ -73,7 +72,7 @@ export function usePermission() {
     }
 
     if (PermissionModeEnum.BACK === permMode) {
-      const allCodeList = permissionStore.getPermCodeList as string[];
+      const allCodeList = userStore.getPermissions as string[];
       if (!isArray(value)) {
         return allCodeList.includes(value);
       }

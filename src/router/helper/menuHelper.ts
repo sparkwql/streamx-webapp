@@ -52,7 +52,6 @@ export function transformRouteToMenu(routeModList: AppRouteModule[], routerMappi
     if (routerMapping && item.meta.hideChildrenInMenu && typeof item.redirect === 'string') {
       item.path = item.redirect;
     }
-
     if (item.meta?.single) {
       const realItem = item?.children?.[0];
       realItem && routeList.push(realItem);
@@ -68,7 +67,8 @@ export function transformRouteToMenu(routeModList: AppRouteModule[], routerMappi
       return {
         ...(node.meta || {}),
         meta: node.meta,
-        name: title,
+        name: node.name || title,
+        title: node.meta.title,
         hideMenu,
         path: node.path,
         ...(node.redirect ? { redirect: node.redirect } : {}),

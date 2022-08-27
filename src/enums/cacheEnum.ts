@@ -1,6 +1,7 @@
 // token key
 export const TOKEN_KEY = 'TOKEN__';
 
+export const PERMISSION_KEY = 'PERMISSION__';
 // expire key
 export const EXPIRE_KEY = 'EXPIRE__';
 

@@ -4,7 +4,13 @@ import { defineStore } from 'pinia';
 import { store } from '/@/store';
 import { RoleEnum } from '/@/enums/roleEnum';
 import { PageEnum } from '/@/enums/pageEnum';
-import { EXPIRE_KEY, ROLES_KEY, TOKEN_KEY, USER_INFO_KEY } from '/@/enums/cacheEnum';
+import {
+  EXPIRE_KEY,
+  PERMISSION_KEY,
+  ROLES_KEY,
+  TOKEN_KEY,
+  USER_INFO_KEY,
+} from '/@/enums/cacheEnum';
 import { getAuthCache, setAuthCache } from '/@/utils/auth';
 import { GetUserInfoModel, LoginParams } from '/@/api/sys/model/userModel';
 import { doLogout, loginApi } from '/@/api/sys/user';
@@ -22,7 +28,7 @@ interface UserState {
   token?: string;
   expire?: string;
   roleList: RoleEnum[];
-  permissions: PermissionState[];
+  permissions: string[];
   sessionTimeout?: boolean;
   lastUpdateTime: number;
 }
@@ -62,6 +68,11 @@ export const useUserStore = defineStore({
     getLastUpdateTime(): number {
       return this.lastUpdateTime;
     },
+    getPermissions(): string[] {
+      return this.permissions?.length > 0
+        ? this.permissions
+        : getAuthCache<string[]>(PERMISSION_KEY);
+    },
   },
   actions: {
     setToken(info: string | undefined) {
@@ -90,12 +101,18 @@ export const useUserStore = defineStore({
       this.roleList = [];
       this.sessionTimeout = false;
     },
+    setPermissions(permissions: string[] = []) {
+      this.permissions = permissions;
+      setAuthCache(PERMISSION_KEY, permissions);
+    },
     setData(data) {
-      const { token, expire, user } = data;
+      const { token, expire, user, permissions, roles } = data;
 
       this.setToken(token);
       this.setExpire(expire);
       this.setUserInfo(user);
+      this.setRoleList(roles);
+      this.setPermissions(permissions);
     },
     /**
      * @description: login
@@ -109,16 +126,8 @@ export const useUserStore = defineStore({
       try {
         const { goHome = true, mode, ...loginParams } = params;
 
-        // const res = await SignIn(loginParams);
-
         const data = await loginApi(loginParams, mode);
-        // console.log(data);
-        // const { token, expire, user } = data;
-        //
-        // // save token
-        // this.setToken(token);
-        // this.setExpire(expire);
-        // this.setUserInfo(user);
+
         this.setData(data);
         return this.afterLoginAction(goHome);
       } catch (error) {

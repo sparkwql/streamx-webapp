@@ -18,7 +18,7 @@ import { ERROR_LOG_ROUTE, PAGE_NOT_FOUND_ROUTE } from '/@/router/routes/basic';
 
 import { filter } from '/@/utils/helper/treeHelper';
 
-import { getMenuList } from '/@/api/sys/menu';
+import { getMenuRouter } from '/@/api/sys/menu';
 import { getPermCode } from '/@/api/sys/user';
 
 import { useMessage } from '/@/hooks/web/useMessage';
@@ -221,8 +221,14 @@ export const usePermissionStore = defineStore({
           // 这个功能可能只需要执行一次，实际项目可以自己放在合适的时间
           let routeList: AppRouteRecordRaw[] = [];
           try {
-            await this.changePermissionCode();
-            routeList = (await getMenuList()) as AppRouteRecordRaw[];
+            // await this.changePermissionCode();
+            routeList = (await getMenuRouter()) as AppRouteRecordRaw[];
+            routeList = (routeList[0].children as AppRouteRecordRaw[]).map((v) => {
+              v.redirect = ((v?.children ?? []) as AppRouteRecordRaw[]).find(
+                (item) => !item?.meta?.hidden,
+              )?.path;
+              return v;
+            });
           } catch (error) {
             console.error(error);
           }
