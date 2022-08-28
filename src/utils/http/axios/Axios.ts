@@ -161,6 +161,7 @@ export class VAxios {
     const headers = config.headers || this.options.headers;
     const contentType = headers?.['Content-Type'] || headers?.['content-type'];
 
+    console.log(contentType);
     if (
       contentType !== ContentTypeEnum.FORM_URLENCODED ||
       !Reflect.has(config, 'data') ||
@@ -169,6 +170,7 @@ export class VAxios {
       return config;
     }
 
+    console.log(config);
     return {
       ...config,
       data: qs.stringify(config.data, { arrayFormat: 'brackets' }),
@@ -205,6 +207,7 @@ export class VAxios {
     }
     conf.requestOptions = opt;
 
+    console.log(transformRequestHook);
     conf = this.supportFormData(conf);
 
     return new Promise((resolve, reject) => {

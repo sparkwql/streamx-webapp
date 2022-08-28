@@ -2,13 +2,19 @@ import { defHttp } from '/@/utils/http/axios';
 import { LoginParams, LoginResultModel, GetUserInfoModel } from './model/userModel';
 
 import { ErrorMessageMode } from '/#/axios';
+import { ContentTypeEnum } from '/@/enums/httpEnum';
 
 enum Api {
-  Login = '/login',
-  Logout = '/logout',
+  Login = '/passport/signin',
+  Logout = '/passport/signout',
   GetUserInfo = '/getUserInfo',
   GetPermCode = '/getPermCode',
   TestRetry = '/testRetry',
+  UserList = '/user/list',
+  NoTokenUsers = '/user/getNoTokenUser',
+  UserUpdate = '/user/update',
+  UserAdd = '/user/post',
+  UserDelete = '/user/delete',
 }
 
 /**
@@ -19,6 +25,9 @@ export function loginApi(params: LoginParams, mode: ErrorMessageMode = 'modal') 
     {
       url: Api.Login,
       params,
+      headers: {
+        'Content-Type': ContentTypeEnum.FORM_URLENCODED,
+      },
     },
     {
       errorMessageMode: mode,
@@ -38,7 +47,57 @@ export function getPermCode() {
 }
 
 export function doLogout() {
-  return defHttp.get({ url: Api.Logout });
+  return defHttp.post({ url: Api.Logout });
+}
+
+export function getUserList(params) {
+  return defHttp.post<GetUserInfoModel>({
+    url: Api.UserList,
+    data: params,
+    headers: {
+      'Content-Type': ContentTypeEnum.FORM_URLENCODED,
+    },
+  });
+}
+
+export function getNoTokenUserList(params) {
+  return defHttp.post<GetUserInfoModel>({
+    url: Api.NoTokenUsers,
+    data: params,
+    headers: {
+      'Content-Type': ContentTypeEnum.FORM_URLENCODED,
+    },
+  });
+}
+
+export function updateUser(data) {
+  return defHttp.put({
+    url: Api.UserUpdate,
+    data,
+    headers: {
+      'Content-Type': ContentTypeEnum.FORM_URLENCODED,
+    },
+  });
+}
+
+export function addUser(data) {
+  return defHttp.post({
+    url: Api.UserAdd,
+    data,
+    headers: {
+      'Content-Type': ContentTypeEnum.FORM_URLENCODED,
+    },
+  });
+}
+
+export function deleteUser(data) {
+  return defHttp.post({
+    url: Api.UserDelete,
+    data,
+    headers: {
+      'Content-Type': ContentTypeEnum.FORM_URLENCODED,
+    },
+  });
 }
 
 export function testRetry() {

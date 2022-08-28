@@ -2,14 +2,19 @@
   <div>
     <BasicTable @register="registerTable" @fetch-success="onFetchSuccess">
       <template #toolbar>
-        <a-button type="primary" @click="handleCreate"> Add Menu </a-button>
+        <a-button type="primary" @click="handleCreate"> Add Team </a-button>
       </template>
       <template #action="{ record }">
         <TableAction
           :actions="[
             {
-              icon: 'clarity:note-edit-line',
-              onClick: handleEdit.bind(null, record),
+              icon: 'ant-design:delete-outlined',
+              color: 'error',
+              tooltip: 'delete Team',
+              popConfirm: {
+                title: 'delete Team, are you sure',
+                confirm: handleDelete.bind(null, record),
+              },
             },
           ]"
         />
@@ -22,31 +27,29 @@
   import { defineComponent, nextTick } from 'vue';
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
-  import { getMenuList } from '/@/api/demo/system';
-
-  import { useDrawer } from '/@/components/Drawer';
   import MenuDrawer from './MenuDrawer.vue';
-
-  import { columns, searchFormSchema } from './menu.data';
+  import { useDrawer } from '/@/components/Drawer';
+  import { columns, searchFormSchema } from './team.data';
+  import { getTeamList, deleteTeam } from '/@/api/sys/team';
+  import { useMessage } from '/@/hooks/web/useMessage';
 
   export default defineComponent({
-    name: 'MenuManagement',
+    name: 'User',
     components: { BasicTable, MenuDrawer, TableAction },
     setup() {
       const [registerDrawer, { openDrawer }] = useDrawer();
+      const { createMessage } = useMessage();
       const [registerTable, { reload, expandAll }] = useTable({
-        title: '菜单列表',
-        api: getMenuList,
+        title: 'Team List',
+        api: getTeamList,
         columns,
         formConfig: {
           labelWidth: 120,
           schemas: searchFormSchema,
         },
-        fetchSetting: {
-          listField: 'rows.children',
-        },
+        rowKey: 'teamId',
         isTreeTable: true,
-        pagination: false,
+        pagination: true,
         striped: false,
         useSearchForm: true,
         showTableSetting: true,
@@ -54,11 +57,11 @@
         showIndexColumn: false,
         canResize: false,
         actionColumn: {
-          width: 100,
-          title: 'Operation',
+          width: 120,
+          title: '操作',
           dataIndex: 'action',
           slots: { customRender: 'action' },
-          fixed: 'right',
+          fixed: undefined,
         },
       });
 
@@ -75,7 +78,19 @@
         });
       }
 
+      function handleView(record: Recordable) {
+        console.log(record);
+      }
+
+      function handleDelete(record: Recordable) {
+        deleteTeam({ teamId: record.teamId }).then((_) => {
+          createMessage.success('delete successful');
+          reload();
+        });
+      }
+
       function handleSuccess() {
+        createMessage.success('add successful');
         reload();
       }
 
@@ -89,8 +104,10 @@
         registerDrawer,
         handleCreate,
         handleEdit,
+        handleDelete,
         handleSuccess,
         onFetchSuccess,
+        handleView,
       };
     },
   });

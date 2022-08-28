@@ -250,7 +250,9 @@ export function useDataSource(
       useSearchForm,
       pagination,
     } = unref(propsRef);
+
     if (!api || !isFunction(api)) return;
+
     try {
       setLoading(true);
       const { pageField, sizeField, listField, totalField } = Object.assign(
@@ -287,13 +289,16 @@ export function useDataSource(
       }
 
       const res = await api(params);
+
       rawDataSourceRef.value = res;
 
       const isArrayResult = Array.isArray(res);
 
+      console.log(listField);
       let resultItems: Recordable[] = isArrayResult ? res : get(res, listField);
-      const resultTotal: number = isArrayResult ? res.length : get(res, totalField);
+      const resultTotal: number = isArrayResult ? res.length : Number(get(res, totalField));
 
+      console.log(resultItems);
       // 假如数据变少，导致总页数变少并小于当前选中页码，通过getPaginationRef获取到的页码是不正确的，需获取正确的页码再次执行
       if (resultTotal) {
         const currentTotalPage = Math.ceil(resultTotal / pageSize);

@@ -27,6 +27,7 @@
     <RoleDrawer @register="registerDrawer" @success="handleSuccess" />
   </div>
 </template>
+
 <script lang="ts">
   import { defineComponent } from 'vue';
 
@@ -60,21 +61,16 @@
           title: '操作',
           dataIndex: 'action',
           slots: { customRender: 'action' },
-          fixed: undefined,
+          fixed: 'right',
         },
       });
 
       function handleCreate() {
-        openDrawer(true, {
-          isUpdate: false,
-        });
+        openDrawer(true, { isUpdate: false });
       }
 
       function handleEdit(record: Recordable) {
-        openDrawer(true, {
-          record,
-          isUpdate: true,
-        });
+        openDrawer(true, { record, isUpdate: true });
       }
 
       function handleDelete(record: Recordable) {
