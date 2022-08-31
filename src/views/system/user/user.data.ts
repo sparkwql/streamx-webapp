@@ -3,11 +3,25 @@ import { h } from 'vue';
 import { Tag } from 'ant-design-vue';
 import { getRoleListByUser } from '/@/api/sys/role';
 import { getTeamListByUser } from '/@/api/sys/team';
+import { checkUserName } from '/@/api/sys/user';
 
 // user status enum
 const enum StatusEnum {
   Effective = '1',
   Locked = '0',
+}
+
+// gender
+const enum GenderEnum {
+  Male = '0',
+  Female = '1',
+  Other = '2',
+}
+
+export const enum DrawerTypeEnum {
+  Create = '0',
+  Edit = '1',
+  View = '2',
 }
 
 export const columns: BasicColumn[] = [
@@ -66,7 +80,11 @@ export const searchFormSchema: FormSchema[] = [
   },
 ];
 
-export const formSchema = (isUpdate = false): FormSchema[] => {
+export const formSchema = (drawerType: string): FormSchema[] => {
+  const isCreate = drawerType === DrawerTypeEnum.Create;
+  // const isUpdate = drawerType === DrawerTypeEnum.Edit;
+  const isView = drawerType === DrawerTypeEnum.View;
+
   return [
     {
       field: 'userId',
@@ -78,33 +96,58 @@ export const formSchema = (isUpdate = false): FormSchema[] => {
       field: 'username',
       label: 'User Name',
       component: 'Input',
-      required: !isUpdate,
-
+      rules: [
+        { required: true, message: 'username is required' },
+        { min: 4, message: 'username length cannot be less than 4 characters' },
+        { max: 8, message: 'exceeds maximum length limit of 8 characters' },
+        {
+          validator: async (_, value) => {
+            if (!isCreate || !value || value.length < 4 || value.length > 8) {
+              return Promise.resolve();
+            }
+            const res = await checkUserName({ username: value });
+            if (!res) {
+              return Promise.reject(`Sorry the username already exists`);
+            }
+          },
+          trigger: 'blur',
+        },
+      ],
       componentProps: {
-        readonly: isUpdate,
+        id: 'formUserName',
+        readonly: !isCreate,
       },
     },
     {
       field: 'nickName',
       label: 'Nick Name',
       component: 'Input',
-      required: !isUpdate,
+      rules: [{ required: isCreate, message: 'nickName is required' }],
       componentProps: {
-        readonly: isUpdate,
+        readonly: !isCreate,
       },
     },
     {
       field: 'password',
       label: 'Password',
       component: 'InputPassword',
+      rules: [
+        { required: true, message: 'password is required' },
+        { min: 8, message: 'Password length cannot be less than 8 characters' },
+      ],
       required: true,
-      ifShow: !isUpdate,
+      ifShow: isCreate,
     },
     {
       field: 'email',
       label: 'E-Mail',
       component: 'Input',
+      rules: [
+        { type: 'email', message: 'please enter a valid email address' },
+        { max: 50, message: 'exceeds maximum length limit of 50 characters' },
+      ],
       componentProps: {
+        readonly: isView,
         placeholder: 'input email',
       },
     },
@@ -113,6 +156,7 @@ export const formSchema = (isUpdate = false): FormSchema[] => {
       field: 'roleId',
       component: 'ApiSelect',
       componentProps: {
+        disabled: isView,
         api: getRoleListByUser,
         resultField: 'records',
         labelField: 'roleName',
@@ -126,19 +170,20 @@ export const formSchema = (isUpdate = false): FormSchema[] => {
       field: 'teamId',
       component: 'ApiSelect',
       componentProps: {
+        id: 'formTeamId',
         api: getTeamListByUser,
         resultField: 'records',
         labelField: 'teamName',
         valueField: 'teamId',
       },
       required: true,
-      show: !isUpdate,
+      show: isCreate,
     },
     {
       field: 'status',
       label: 'Status',
       component: 'RadioGroup',
-      defaultValue: '0',
+      defaultValue: StatusEnum.Locked,
       componentProps: {
         options: [
           { label: 'locked', value: StatusEnum.Locked },
@@ -151,12 +196,12 @@ export const formSchema = (isUpdate = false): FormSchema[] => {
       field: 'sex',
       label: 'Gender',
       component: 'RadioGroup',
-      defaultValue: '0',
+      defaultValue: GenderEnum.Male,
       componentProps: {
         options: [
-          { label: 'male', value: '0' },
-          { label: 'female', value: '1' },
-          { label: 'secret', value: '2' },
+          { label: 'male', value: GenderEnum.Male },
+          { label: 'female', value: GenderEnum.Female },
+          { label: 'secret', value: GenderEnum.Other },
         ],
       },
       required: true,

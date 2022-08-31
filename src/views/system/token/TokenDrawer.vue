@@ -4,7 +4,7 @@
     @register="registerDrawer"
     showFooter
     :title="getTitle"
-    width="50%"
+    width="40%"
     @ok="handleSubmit"
   >
     <BasicForm @register="registerForm" />

@@ -15,6 +15,8 @@ enum Api {
   UserUpdate = '/user/update',
   UserAdd = '/user/post',
   UserDelete = '/user/delete',
+  ResetPassword = '/user/password/reset',
+  CheckName = '/user/check/name',
 }
 
 /**
@@ -91,9 +93,29 @@ export function addUser(data) {
 }
 
 export function deleteUser(data) {
-  return defHttp.post({
+  return defHttp.delete({
     url: Api.UserDelete,
     data,
+    headers: {
+      'Content-Type': ContentTypeEnum.FORM_URLENCODED,
+    },
+  });
+}
+
+export function resetPassword(data) {
+  return defHttp.put({
+    url: Api.ResetPassword,
+    data,
+    headers: {
+      'Content-Type': ContentTypeEnum.FORM_URLENCODED,
+    },
+  });
+}
+
+export function checkUserName(params) {
+  return defHttp.post({
+    url: Api.CheckName,
+    data: params,
     headers: {
       'Content-Type': ContentTypeEnum.FORM_URLENCODED,
     },

@@ -4,11 +4,12 @@ import { Switch } from 'ant-design-vue';
 import { useMessage } from '/@/hooks/web/useMessage';
 import { setTokenStatus } from '/@/api/sys/token';
 import { getNoTokenUserList } from '/@/api/sys/user';
+import dayjs from 'dayjs';
 
 // status enum
 const enum StatusEnum {
-  On = 1,
-  Off = 0,
+  On = '1',
+  Off = '0',
 }
 
 export const columns: BasicColumn[] = [
@@ -38,14 +39,14 @@ export const columns: BasicColumn[] = [
   },
   {
     title: 'Status',
-    dataIndex: 'status',
+    dataIndex: 'userStatus',
     width: 100,
     customRender: ({ record }) => {
       if (!Reflect.has(record, 'pendingStatus')) {
         record.pendingStatus = false;
       }
       return h(Switch, {
-        checked: record.status === StatusEnum.On,
+        checked: record.userStatus === StatusEnum.On,
         checkedChildren: 'on',
         unCheckedChildren: 'off',
         loading: record.pendingStatus,
@@ -53,13 +54,11 @@ export const columns: BasicColumn[] = [
           record.pendingStatus = true;
           const newStatus = checked ? StatusEnum.On : StatusEnum.Off;
           const { createMessage } = useMessage();
+
           setTokenStatus({ tokenId: record.id })
             .then(() => {
-              record.status = newStatus;
+              record.userStatus = newStatus;
               createMessage.success(`success`);
-            })
-            .catch(() => {
-              createMessage.error('fail');
             })
             .finally(() => {
               record.pendingStatus = false;
@@ -84,6 +83,7 @@ export const formSchema: FormSchema[] = [
     field: 'userId',
     label: 'User',
     component: 'ApiSelect',
+    required: true,
     componentProps: {
       api: getNoTokenUserList,
       resultField: 'records',
@@ -97,8 +97,12 @@ export const formSchema: FormSchema[] = [
     component: 'InputTextArea',
   },
   {
-    field: 'ExpireTime',
-    label: 'expireTime',
+    field: 'expireTime',
+    label: 'ExpireTime',
     component: 'DatePicker',
+    defaultValue: dayjs('9999-01-01'),
+    componentProps: {
+      disabled: true,
+    },
   },
 ];

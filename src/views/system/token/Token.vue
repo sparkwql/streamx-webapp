@@ -17,7 +17,7 @@
               color: 'error',
               tooltip: 'Delete Token',
               popConfirm: {
-                title: 'delete token, are you sure',
+                title: 'are you sure delete this token ?',
                 confirm: handleDelete.bind(null, record),
               },
             },
@@ -53,6 +53,12 @@
         formConfig: {
           labelWidth: 120,
           schemas: searchFormSchema,
+          resetButtonOptions: {
+            text: 'reset',
+          },
+          submitButtonOptions: {
+            text: 'search',
+          },
         },
         isTreeTable: true,
         pagination: true,
@@ -65,10 +71,10 @@
         canResize: false,
         actionColumn: {
           width: 120,
-          title: '操作',
+          title: 'Operation',
           dataIndex: 'action',
           slots: { customRender: 'action' },
-          fixed: undefined,
+          fixed: 'right',
         },
       });
 
