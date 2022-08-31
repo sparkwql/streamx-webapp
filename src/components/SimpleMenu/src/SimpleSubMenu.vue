@@ -75,8 +75,10 @@
       const { t } = useI18n();
       const { prefixCls } = useDesign('simple-menu');
 
-      const getShowMenu = computed(() => !props.item?.meta?.hideMenu);
-      const getIcon = computed(() => props.item?.icon);
+      const getShowMenu = computed(() => !props.item?.meta?.hidden);
+      const getIcon = computed(() =>
+        props.item?.icon ? `ant-design:${props.item?.icon}-outlined` : '',
+      );
       const getI18nName = computed(() => t(props.item?.name));
       const getShowSubTitle = computed(() => !props.collapse || !props.parent);
       const getIsCollapseParent = computed(() => !!props.collapse && !!props.parent);
