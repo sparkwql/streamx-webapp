@@ -9,7 +9,13 @@ enum Api {
 }
 
 export function getTokenList(params?) {
-  return defHttp.post({ url: Api.TokenList, params });
+  return defHttp.post({
+    url: Api.TokenList,
+    params,
+    headers: {
+      'Content-Type': ContentTypeEnum.FORM_URLENCODED,
+    },
+  });
 }
 
 export function setTokenStatus(data) {

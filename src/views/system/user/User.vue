@@ -20,11 +20,21 @@
             },
             {
               icon: 'bx:reset',
-              color: 'error',
               auth: 'user:reset',
               tooltip: 'reset password',
               popConfirm: {
                 title: 'reset password, are you sure',
+                confirm: handleReset.bind(null, record),
+              },
+            },
+            {
+              icon: 'ant-design:delete-outlined',
+              color: 'error',
+              auth: 'user:delete',
+              ifShow: record.username !== 'admin',
+              tooltip: 'delete user',
+              popConfirm: {
+                title: 'delete user, are you sure',
                 confirm: handleDelete.bind(null, record),
               },
             },
@@ -32,26 +42,26 @@
         />
       </template>
     </BasicTable>
-    <MenuDrawer @register="registerDrawer" @success="handleSuccess" />
+    <UserDrawer @register="registerDrawer" @success="handleSuccess" />
   </div>
 </template>
 <script lang="ts">
   import { defineComponent } from 'vue';
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
-  import MenuDrawer from './MenuDrawer.vue';
+  import UserDrawer from './UserDrawer.vue';
   import { useDrawer } from '/@/components/Drawer';
-  import { deleteUser, getUserList } from '/@/api/sys/user';
-  import { columns, searchFormSchema } from './user.data';
+  import { deleteUser, getUserList, resetPassword } from '/@/api/sys/user';
+  import { columns, searchFormSchema, DrawerTypeEnum } from './user.data';
   import { useMessage } from '/@/hooks/web/useMessage';
 
   export default defineComponent({
     name: 'User',
-    components: { BasicTable, MenuDrawer, TableAction },
+    components: { BasicTable, UserDrawer, TableAction },
     setup() {
       const [registerDrawer, { openDrawer }] = useDrawer();
-      const { notification } = useMessage();
-      const [registerTable, { reload, updateTableDataRecord }] = useTable({
+      const { createMessage, createSuccessModal } = useMessage();
+      const [registerTable, { reload }] = useTable({
         title: '',
         api: getUserList,
         columns,
@@ -69,7 +79,7 @@
         showIndexColumn: false,
         canResize: false,
         actionColumn: {
-          width: 120,
+          width: 140,
           title: 'Operation',
           dataIndex: 'action',
           slots: { customRender: 'action' },
@@ -78,35 +88,45 @@
       });
 
       function handleCreate() {
-        openDrawer(true, {
-          isUpdate: false,
-        });
+        openDrawer(true, { drawerType: DrawerTypeEnum.Create });
       }
 
       function handleEdit(record: Recordable) {
         openDrawer(true, {
           record,
-          isUpdate: true,
+          drawerType: DrawerTypeEnum.Edit,
         });
       }
 
       // see detail
       function handleView(record: Recordable) {
-        console.log(record);
+        openDrawer(true, {
+          record,
+          drawerType: DrawerTypeEnum.View,
+        });
       }
 
       // delete current user
       function handleDelete(record: Recordable) {
-        deleteUser({ userId: record.userId });
+        deleteUser({ userId: record.userId }).then((_) => {
+          createMessage.success('success');
+          reload();
+        });
+      }
+
+      function handleReset(record: Recordable) {
+        resetPassword({ usernames: record.username }).then((_) => {
+          createSuccessModal({
+            title: 'reset password successful',
+            content: `user [${record.username}] new password is streamx666`,
+          });
+        });
       }
 
       // add/edit user success
-      function handleSuccess({ isUpdate, values }) {
-        notification.success({
-          message: 'Tip',
-          description: 'Success',
-        });
-        isUpdate ? updateTableDataRecord(values.userId, values) : reload();
+      function handleSuccess() {
+        createMessage.success('success');
+        reload();
       }
 
       return {
@@ -117,6 +137,7 @@
         handleDelete,
         handleSuccess,
         handleView,
+        handleReset,
       };
     },
   });
