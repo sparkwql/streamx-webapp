@@ -52,7 +52,8 @@
   import UserDrawer from './UserDrawer.vue';
   import { useDrawer } from '/@/components/Drawer';
   import { deleteUser, getUserList, resetPassword } from '/@/api/sys/user';
-  import { columns, searchFormSchema, DrawerTypeEnum } from './user.data';
+  import { columns, searchFormSchema } from './user.data';
+  import { FormTypeEnum } from '/@/enums/formEnum';
   import { useMessage } from '/@/hooks/web/useMessage';
 
   export default defineComponent({
@@ -88,13 +89,13 @@
       });
 
       function handleCreate() {
-        openDrawer(true, { drawerType: DrawerTypeEnum.Create });
+        openDrawer(true, { formType: FormTypeEnum.Create });
       }
 
       function handleEdit(record: Recordable) {
         openDrawer(true, {
           record,
-          drawerType: DrawerTypeEnum.Edit,
+          formType: FormTypeEnum.Edit,
         });
       }
 
@@ -102,7 +103,7 @@
       function handleView(record: Recordable) {
         openDrawer(true, {
           record,
-          drawerType: DrawerTypeEnum.View,
+          formType: FormTypeEnum.View,
         });
       }
 

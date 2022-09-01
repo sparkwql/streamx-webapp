@@ -28,12 +28,14 @@
   import MenuDrawer from './MenuDrawer.vue';
 
   import { columns, searchFormSchema } from './menu.data';
+  import { useMessage } from '/@/hooks/web/useMessage';
 
   export default defineComponent({
     name: 'MenuManagement',
     components: { BasicTable, MenuDrawer, TableAction },
     setup() {
       const [registerDrawer, { openDrawer }] = useDrawer();
+      const { createMessage } = useMessage();
       const [registerTable, { reload, expandAll }] = useTable({
         title: '',
         api: getMenuList,
@@ -63,9 +65,7 @@
       });
 
       function handleCreate() {
-        openDrawer(true, {
-          isUpdate: false,
-        });
+        openDrawer(true, { isUpdate: false });
       }
 
       function handleEdit(record: Recordable) {
@@ -76,6 +76,7 @@
       }
 
       function handleSuccess() {
+        createMessage.success('success');
         reload();
       }
 

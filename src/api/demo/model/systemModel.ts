@@ -21,6 +21,7 @@ export type MenuParams = {
   menuName?: string;
   status?: string;
   roleId?: number;
+  type?: string;
 };
 
 export type UserParams = {

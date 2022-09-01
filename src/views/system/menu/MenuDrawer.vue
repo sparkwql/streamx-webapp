@@ -7,16 +7,17 @@
     width="50%"
     @ok="handleSubmit"
   >
-    <BasicForm @register="registerForm" />
+    <BasicForm @register="registerForm"></BasicForm>
   </BasicDrawer>
 </template>
 <script lang="ts">
   import { defineComponent, ref, computed, unref } from 'vue';
   import { BasicForm, useForm } from '/@/components/Form';
-  import { formSchema } from './menu.data';
+  import { formSchema, TypeEnum } from './menu.data';
   import { BasicDrawer, useDrawerInner } from '/@/components/Drawer';
 
   import { getMenuList } from '/@/api/demo/system';
+  import { addMenu, editMenu } from '/@/api/sys/menu';
 
   export default defineComponent({
     name: 'MenuDrawer',
@@ -26,10 +27,10 @@
       const isUpdate = ref(true);
 
       const [registerForm, { resetFields, setFieldsValue, updateSchema, validate }] = useForm({
-        labelWidth: 100,
+        labelWidth: 120,
         schemas: formSchema,
         showActionButtonGroup: false,
-        baseColProps: { lg: 12, md: 24 },
+        baseColProps: { lg: 22, md: 22 },
       });
 
       const [registerDrawer, { setDrawerProps, closeDrawer }] = useDrawerInner(async (data) => {
@@ -40,23 +41,26 @@
         if (unref(isUpdate)) {
           setFieldsValue({
             ...data.record,
+            menuName: data.record.title,
+            orderNum: data.record.order,
+            perms: data.record.permission,
+            menuId: data.record.id,
           });
         }
-        const treeData = await getMenuList();
+        const res = await getMenuList({ type: TypeEnum.Menu });
         updateSchema({
-          field: 'parentMenu',
-          componentProps: { treeData },
+          field: 'parentId',
+          componentProps: { treeData: res?.rows?.children },
         });
       });
 
-      const getTitle = computed(() => (!unref(isUpdate) ? '新增菜单' : '编辑菜单'));
+      const getTitle = computed(() => (!unref(isUpdate) ? 'Add Menu' : 'Edit Menu'));
 
       async function handleSubmit() {
         try {
           const values = await validate();
           setDrawerProps({ confirmLoading: true });
-          // TODO custom api
-          console.log(values);
+          unref(isUpdate) ? await editMenu(values) : await addMenu(values);
           closeDrawer();
           emit('success');
         } finally {

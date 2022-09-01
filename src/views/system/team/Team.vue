@@ -20,14 +20,14 @@
         />
       </template>
     </BasicTable>
-    <MenuDrawer @register="registerDrawer" @success="handleSuccess" />
+    <TeamDrawer @register="registerDrawer" @success="handleSuccess" />
   </div>
 </template>
 <script lang="ts">
   import { defineComponent, nextTick } from 'vue';
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
-  import MenuDrawer from './MenuDrawer.vue';
+  import TeamDrawer from './TeamDrawer.vue';
   import { useDrawer } from '/@/components/Drawer';
   import { columns, searchFormSchema } from './team.data';
   import { getTeamList, deleteTeam } from '/@/api/sys/team';
@@ -35,7 +35,7 @@
 
   export default defineComponent({
     name: 'User',
-    components: { BasicTable, MenuDrawer, TableAction },
+    components: { BasicTable, TeamDrawer, TableAction },
     setup() {
       const [registerDrawer, { openDrawer }] = useDrawer();
       const { createMessage } = useMessage();
@@ -58,10 +58,10 @@
         canResize: false,
         actionColumn: {
           width: 120,
-          title: '操作',
+          title: 'Operation',
           dataIndex: 'action',
           slots: { customRender: 'action' },
-          fixed: undefined,
+          fixed: 'right',
         },
       });
 
@@ -99,6 +99,9 @@
         nextTick(expandAll);
       }
 
+      function onChange(val) {
+        console.log(val);
+      }
       return {
         registerTable,
         registerDrawer,
@@ -108,6 +111,7 @@
         handleSuccess,
         onFetchSuccess,
         handleView,
+        onChange,
       };
     },
   });

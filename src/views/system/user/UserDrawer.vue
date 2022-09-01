@@ -13,7 +13,8 @@
 <script lang="ts">
   import { computed, defineComponent, ref, unref } from 'vue';
   import { BasicForm, useForm } from '/@/components/Form';
-  import { DrawerTypeEnum, formSchema } from './user.data';
+  import { formSchema } from './user.data';
+  import { FormTypeEnum } from '/@/enums/formEnum';
   import { BasicDrawer, useDrawerInner } from '/@/components/Drawer';
 
   import { addUser, updateUser } from '/@/api/sys/user';
@@ -23,12 +24,12 @@
     components: { BasicDrawer, BasicForm },
     emits: ['success', 'register'],
     setup(_, { emit }) {
-      const drawerType = ref(DrawerTypeEnum.View);
+      const formType = ref(FormTypeEnum.Edit);
 
       const [registerForm, { resetFields, setFieldsValue, updateSchema, validate, clearValidate }] =
         useForm({
           labelWidth: 120,
-          schemas: formSchema(unref(drawerType)),
+          schemas: formSchema(unref(formType)),
           showActionButtonGroup: false,
           baseColProps: { lg: 22, md: 22 },
         });
@@ -37,13 +38,13 @@
         resetFields();
         setDrawerProps({
           confirmLoading: false,
-          showFooter: data.drawerType !== DrawerTypeEnum.View,
+          showFooter: data.formType !== FormTypeEnum.View,
         });
-        drawerType.value = data.drawerType;
+        formType.value = data.formType;
 
-        updateSchema(formSchema(unref(drawerType)));
+        updateSchema(formSchema(unref(formType)));
 
-        if (unref(drawerType) !== DrawerTypeEnum.Create) {
+        if (unref(formType) !== FormTypeEnum.Create) {
           const roleIds = data.record?.roleId ?? [];
           data.record.roleId = Array.isArray(roleIds) ? roleIds : roleIds.split(',');
           setFieldsValue({
@@ -56,19 +57,17 @@
 
       const getTitle = computed(() => {
         return {
-          [DrawerTypeEnum.Create]: 'Add User',
-          [DrawerTypeEnum.Edit]: 'Edit User',
-          [DrawerTypeEnum.View]: 'View User',
-        }[unref(drawerType)];
+          [FormTypeEnum.Create]: 'Add User',
+          [FormTypeEnum.Edit]: 'Edit User',
+          [FormTypeEnum.View]: 'View User',
+        }[unref(formType)];
       });
 
       async function handleSubmit() {
         try {
           const values = await validate();
           setDrawerProps({ confirmLoading: true });
-          unref(drawerType) === DrawerTypeEnum.Edit
-            ? await updateUser(values)
-            : await addUser(values);
+          unref(formType) === FormTypeEnum.Edit ? await updateUser(values) : await addUser(values);
           closeDrawer();
           emit('success');
         } finally {
