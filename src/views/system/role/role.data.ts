@@ -30,45 +30,34 @@ export const searchFormSchema: FormSchema[] = [
   {
     field: 'createTime',
     label: 'Create Time',
-    component: 'DatePicker',
+    component: 'RangePicker',
     colProps: { span: 8 },
   },
 ];
 
 export const formSchema: FormSchema[] = [
   {
+    field: 'roleId',
+    label: 'Role Id',
+    component: 'Input',
+    show: false,
+  },
+  {
     field: 'roleName',
-    label: '角色名称',
+    label: 'Role Name',
     required: true,
     component: 'Input',
   },
   {
-    field: 'roleValue',
-    label: '角色值',
-    required: true,
-    component: 'Input',
-  },
-  {
-    field: 'status',
-    label: '状态',
-    component: 'RadioButtonGroup',
-    defaultValue: '0',
-    componentProps: {
-      options: [
-        { label: '启用', value: '0' },
-        { label: '停用', value: '1' },
-      ],
-    },
-  },
-  {
-    label: '备注',
+    label: 'Description',
     field: 'remark',
     component: 'InputTextArea',
   },
   {
-    label: ' ',
-    field: 'menu',
+    label: '',
+    field: 'menuId',
     slot: 'menu',
+    defaultValue: [],
     component: 'Input',
   },
 ];

@@ -28,7 +28,7 @@ export const searchFormSchema: FormSchema[] = [
   {
     field: 'createTime',
     label: 'Create Time',
-    component: 'DatePicker',
+    component: 'RangePicker',
     colProps: { span: 8 },
   },
 ];

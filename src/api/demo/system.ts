@@ -12,6 +12,7 @@ import {
   RoleListGetResultModel,
 } from './model/systemModel';
 import { defHttp } from '/@/utils/http/axios';
+import { ContentTypeEnum } from '/@/enums/httpEnum';
 
 enum Api {
   AccountList = '/system/getAccountList',
@@ -32,13 +33,31 @@ export const getDeptList = (params?: DeptListItem) =>
   defHttp.get<DeptListGetResultModel>({ url: Api.DeptList, params });
 
 export const getMenuList = (params?: MenuParams) =>
-  defHttp.post<MenuListGetResultModel>({ url: Api.MenuList, params }, { joinParamsToUrl: true });
+  defHttp.post<MenuListGetResultModel>({
+    url: Api.MenuList,
+    params,
+    headers: {
+      'Content-Type': ContentTypeEnum.FORM_URLENCODED,
+    },
+  });
 
 export const getRoleMenu = (params?: MenuParams) =>
-  defHttp.post<MenuListGetResultModel>({ url: Api.RoleMenu, params }, { joinParamsToUrl: true });
+  defHttp.post<MenuListGetResultModel>(
+    {
+      url: Api.RoleMenu,
+      params,
+    },
+    { joinParamsToUrl: true },
+  );
 
 export const getRoleListByPage = (params?: RolePageParams) =>
-  defHttp.post<RolePageListGetResultModel>({ url: Api.RolePageList, params });
+  defHttp.post<RolePageListGetResultModel>({
+    url: Api.RolePageList,
+    params,
+    headers: {
+      'Content-Type': ContentTypeEnum.FORM_URLENCODED,
+    },
+  });
 
 export const getAllRoleList = (params?: RoleParams) =>
   defHttp.get<RoleListGetResultModel>({ url: Api.GetAllRoleList, params });

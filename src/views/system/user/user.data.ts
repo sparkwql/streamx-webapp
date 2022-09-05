@@ -4,6 +4,7 @@ import { Tag } from 'ant-design-vue';
 import { getRoleListByUser } from '/@/api/sys/role';
 import { getTeamListByUser } from '/@/api/sys/team';
 import { checkUserName } from '/@/api/sys/user';
+import { FormTypeEnum } from '/@/enums/formEnum';
 
 // user status enum
 const enum StatusEnum {
@@ -16,12 +17,6 @@ const enum GenderEnum {
   Male = '0',
   Female = '1',
   Other = '2',
-}
-
-export const enum DrawerTypeEnum {
-  Create = '0',
-  Edit = '1',
-  View = '2',
 }
 
 export const columns: BasicColumn[] = [
@@ -80,10 +75,10 @@ export const searchFormSchema: FormSchema[] = [
   },
 ];
 
-export const formSchema = (drawerType: string): FormSchema[] => {
-  const isCreate = drawerType === DrawerTypeEnum.Create;
-  // const isUpdate = drawerType === DrawerTypeEnum.Edit;
-  const isView = drawerType === DrawerTypeEnum.View;
+export const formSchema = (formType: string): FormSchema[] => {
+  const isCreate = formType === FormTypeEnum.Create;
+  // const isUpdate = formType === FormTypeEnum.Edit;
+  const isView = formType === FormTypeEnum.View;
 
   return [
     {

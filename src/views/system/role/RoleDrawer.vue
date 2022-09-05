@@ -4,7 +4,7 @@
     @register="registerDrawer"
     showFooter
     :title="getTitle"
-    width="500px"
+    width="40%"
     @ok="handleSubmit"
   >
     <BasicForm @register="registerForm">
@@ -27,51 +27,77 @@
   import { formSchema } from './role.data';
   import { BasicDrawer, useDrawerInner } from '/@/components/Drawer';
   import { BasicTree, TreeItem } from '/@/components/Tree';
-
+  import { addRole, editRole } from '/@/api/sys/role';
   import { getMenuList, getRoleMenu } from '/@/api/demo/system';
+  import { FormTypeEnum } from '/@/enums/formEnum';
+
+  const handleTreeIcon = (treeData: TreeItem[]): TreeItem[] => {
+    if (!treeData?.length) {
+      return [];
+    }
+    treeData.forEach((v) => {
+      v.icon = v.icon && !v.icon.includes('ant-design:') ? `ant-design:${v.icon}-outlined` : v.icon;
+      v.children && handleTreeIcon(v.children);
+    });
+    return treeData;
+  };
 
   export default defineComponent({
     name: 'RoleDrawer',
     components: { BasicDrawer, BasicForm, BasicTree },
     emits: ['success', 'register'],
     setup(_, { emit }) {
-      const isUpdate = ref(true);
+      const formType = ref(FormTypeEnum.Edit);
       const treeData = ref<TreeItem[]>([]);
 
       const [registerForm, { resetFields, setFieldsValue, validate }] = useForm({
-        labelWidth: 90,
-        baseColProps: { span: 24 },
+        labelWidth: 120,
+        baseColProps: { span: 22 },
         schemas: formSchema,
         showActionButtonGroup: false,
       });
 
       const [registerDrawer, { setDrawerProps, closeDrawer }] = useDrawerInner(async (data) => {
         resetFields();
-        setDrawerProps({ confirmLoading: false });
-        // 需要在setFieldsValue之前先填充treeData，否则Tree组件可能会报key not exist警告
-        if (unref(treeData).length === 0) {
-          const roleMenu = !!data?.isUpdate && (await getRoleMenu({ roleId: data.record.roleId }));
-          data.record.menu = roleMenu;
-          const res = await getMenuList();
-          treeData.value = res?.rows?.children as any as TreeItem[];
-        }
-        isUpdate.value = !!data?.isUpdate;
+        setDrawerProps({
+          confirmLoading: false,
+          showFooter: data.formType !== FormTypeEnum.View,
+        });
 
-        if (unref(isUpdate)) {
-          setFieldsValue({
-            ...data.record,
-          });
+        formType.value = data.formType;
+        // 需要在setFieldsValue之前先填充treeData，否则Tree组件可能会报key not exist警告
+        if (!unref(isCreate)) {
+          const res = await getRoleMenu({ roleId: data.record.roleId });
+          data.record.menuId = res || [];
+        }
+
+        if (unref(treeData).length === 0) {
+          const res = await getMenuList();
+          treeData.value = handleTreeIcon(res?.rows?.children);
+        }
+
+        if (!unref(isCreate)) {
+          setFieldsValue({ ...data.record });
         }
       });
 
-      const getTitle = computed(() => (!unref(isUpdate) ? '新增角色' : '编辑角色'));
+      const getTitle = computed(() => {
+        return {
+          [FormTypeEnum.Create]: 'Add Role',
+          [FormTypeEnum.Edit]: 'Edit Role',
+          [FormTypeEnum.View]: 'View Role',
+        }[unref(formType)];
+      });
+
+      const isCreate = computed(() => unref(formType) === FormTypeEnum.Create);
 
       async function handleSubmit() {
         try {
           const values = await validate();
           setDrawerProps({ confirmLoading: true });
-          // TODO custom api
-          console.log(values);
+          const params = { ...values };
+          params.menuId = values.menuId.join(',');
+          !unref(isCreate) ? await editRole(params) : await addRole(params);
           closeDrawer();
           emit('success');
         } finally {
