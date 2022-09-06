@@ -1,13 +1,15 @@
 <template>
   <Footer :class="prefixCls" v-if="getShowLayoutFooter" ref="footerRef">
     <div :class="`${prefixCls}__links`">
-      <a @click="openWindow(SITE_URL)">{{ t('layout.footer.onlinePreview') }}</a>
+      <!-- <a @click="openWindow(SITE_URL)">{{ t('layout.footer.onlinePreview') }}</a> -->
 
       <GithubFilled @click="openWindow(GITHUB_URL)" :class="`${prefixCls}__github`" />
 
-      <a @click="openWindow(DOC_URL)">{{ t('layout.footer.onlineDocument') }}</a>
+      <!-- <a @click="openWindow(DOC_URL)">{{ t('layout.footer.onlineDocument') }}</a> -->
     </div>
-    <div>Copyright &copy;2020 Vben Admin</div>
+    <div :class="`${prefixCls}__copyright`">
+      Copyright &copy;2019~{{ new Date().getFullYear() }} StreamX
+    </div>
   </Footer>
 </template>
 
@@ -64,22 +66,23 @@
 <style lang="less" scoped>
   @prefix-cls: ~'@{namespace}-layout-footer';
 
-  @normal-color: rgba(0, 0, 0, 0.45);
+  @normal-link-color: rgba(0, 0, 0, 0.45);
 
   @hover-color: rgba(0, 0, 0, 0.85);
 
   .@{prefix-cls} {
-    color: @normal-color;
+    color: @normal-link-color;
     text-align: center;
 
     &__links {
       margin-bottom: 8px;
 
       a {
-        color: @normal-color;
+        color: @normal-link-color;
 
         &:hover {
           color: @hover-color;
+          cursor: pointer;
         }
       }
     }
@@ -88,6 +91,15 @@
       margin: 0 30px;
 
       &:hover {
+        color: @hover-color;
+      }
+    }
+
+    &__copyright {
+      color: @normal-link-color;
+
+      &:hover {
+        cursor: pointer;
         color: @hover-color;
       }
     }

@@ -3,6 +3,7 @@ export default {
   header: {
     // user dropdown
     dropdownItemDoc: '文档',
+    ChangePassword: '更改密码',
     dropdownItemLoginOut: '退出系统',
 
     // tooltip

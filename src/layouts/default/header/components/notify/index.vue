@@ -30,6 +30,7 @@
   import NoticeList from './NoticeList.vue';
   import { useDesign } from '/@/hooks/web/useDesign';
   import { useMessage } from '/@/hooks/web/useMessage';
+  import { fetchNotify } from '/@/api/sys/notify';
 
   export default defineComponent({
     components: { Popover, BellOutlined, Tabs, TabPane: Tabs.TabPane, Badge, NoticeList },
@@ -51,7 +52,18 @@
         // 可以直接将其标记为已读（为标题添加删除线）,此处演示的代码会切换删除线状态
         record.titleDelete = !record.titleDelete;
       }
-
+      async function getNoticyList(type: number) {
+        const data1 = [] as any;
+        const data2 = [] as any;
+        const res = await fetchNotify({ type, pageNum: 1, pageSize: 8 });
+        if (type === 1) {
+          data1.push(...res.records);
+        } else {
+          data2.push(...res.records);
+        }
+        console.log('res', res);
+      }
+      getNoticyList(1);
       return {
         prefixCls,
         listData,
