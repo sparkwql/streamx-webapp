@@ -4,7 +4,12 @@ export interface NoticyList {
 }
 export interface NoticyItem {
   id: string;
+  appId: string;
+  userId: string;
   title: string;
-  createTime: string;
+  type: number;
   context: string;
+  readed: number;
+  createTime: string;
+  extra?: string;
 }

@@ -4,6 +4,7 @@ import { defHttp } from '/@/utils/http/axios';
 
 enum NOTIFY_API {
   NOTICE = '/metrics/notice',
+  DEL = '/metrics/delnotice',
 }
 /**
  * 获取通知列表
@@ -16,6 +17,21 @@ export const fetchNotify = (params: { type: number; pageNum: number; pageSize: n
   return defHttp.post<NoticyList>({
     url: NOTIFY_API.NOTICE,
     params,
+    headers: {
+      'Content-Type': ContentTypeEnum.FORM_URLENCODED,
+    },
+  });
+};
+
+/**
+ * 删除通知
+ * @param {number} id 通知id,
+ * @returns Promise<boolean>
+ */
+export const fetchNotifyDelete = (id: string) => {
+  return defHttp.post<NoticyList>({
+    url: NOTIFY_API.DEL,
+    params: { id },
     headers: {
       'Content-Type': ContentTypeEnum.FORM_URLENCODED,
     },

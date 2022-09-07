@@ -1,24 +1,27 @@
 <template>
   <a-list :class="prefixCls" bordered :pagination="getPagination">
     <template v-for="item in getData" :key="item.id">
-      <a-list-item class="list-item">
+      <a-list-item class="list-item" @click="handleNoticyClick(item)">
+        <template #extra>
+          <delete-outlined
+            v-if="item.readed === 0"
+            @click="handleDelete(item)"
+            class="!text-red-500"
+          />
+        </template>
         <a-list-item-meta>
           <template #title>
             <div class="title">
               <a-typography-paragraph
-                @click="handleTitleClick(item)"
                 style="width: 100%; margin-bottom: 0 !important"
-                :style="{ cursor: isTitleClickable ? 'pointer' : '' }"
-                :delete="!!item.titleDelete"
-                :ellipsis="
-                  $props.titleRows && $props.titleRows > 0
-                    ? { rows: $props.titleRows, tooltip: !!item.title }
-                    : false
-                "
+                :disabled="!!item.readed"
+                :delete="!!item.readed"
+                :ellipsis="true"
+                :ellipsisTooltip="item.title"
                 :content="item.title"
               />
               <div class="extra" v-if="item.extra">
-                <a-tag class="tag" :color="item.color">
+                <a-tag class="tag" color="red">
                   {{ item.extra }}
                 </a-tag>
               </div>
@@ -26,25 +29,28 @@
           </template>
 
           <template #avatar>
-            <a-avatar v-if="item.avatar" class="avatar" :src="item.avatar" />
-            <span v-else> {{ item.avatar }}</span>
+            <a-avatar
+              v-if="item.type == 1"
+              class="avatar"
+              src="https://gw.alipayobjects.com/zos/rmsportal/ThXAXghbEsBCCSDihZxY.png"
+            />
           </template>
 
           <template #description>
             <div>
-              <div class="description" v-if="item.description">
+              <div class="description" v-if="item.context">
                 <a-typography-paragraph
-                  style="width: 100%; margin-bottom: 0 !important"
-                  :ellipsis="
-                    $props.descRows && $props.descRows > 0
-                      ? { rows: $props.descRows, tooltip: !!item.description }
-                      : false
-                  "
-                  :content="item.description"
+                  style="width: 100%; color: #7f838b; margin-bottom: 0 !important"
+                  :disabled="!!item.readed"
+                  :delete="!!item.readed"
+                  :ellipsis="true"
+                  :ellipsisTooltip="item.context"
+                  :content="item.context"
                 />
               </div>
               <div class="datetime">
-                {{ item.datetime }}
+                <clock-circle-outlined />
+                {{ item.createTime }}
               </div>
             </div>
           </template>
@@ -55,10 +61,11 @@
 </template>
 <script lang="ts">
   import { computed, defineComponent, PropType, ref, watch, unref } from 'vue';
-  import { ListItem } from './data';
+  import { ClockCircleOutlined, DeleteOutlined } from '@ant-design/icons-vue';
   import { useDesign } from '/@/hooks/web/useDesign';
   import { List, Avatar, Tag, Typography } from 'ant-design-vue';
   import { isNumber } from '/@/utils/is';
+  import { NoticyItem } from '/@/api/sys/model/notifyModel';
   export default defineComponent({
     components: {
       [Avatar.name]: Avatar,
@@ -66,12 +73,18 @@
       [List.Item.name]: List.Item,
       AListItemMeta: List.Item.Meta,
       ATypographyParagraph: Typography.Paragraph,
+      ClockCircleOutlined,
+      DeleteOutlined,
       [Tag.name]: Tag,
     },
     props: {
       list: {
-        type: Array as PropType<ListItem[]>,
+        type: Array as PropType<NoticyItem[]>,
         default: () => [],
+      },
+      noticyType: {
+        type: Number,
+        default: 1,
       },
       pageSize: {
         type: [Boolean, Number] as PropType<Boolean | Number>,
@@ -89,7 +102,10 @@
         type: Number,
         default: 2,
       },
-      onTitleClick: {
+      onNoticyClick: {
+        type: Function as PropType<(Recordable) => void>,
+      },
+      onNoticyDel: {
         type: Function as PropType<(Recordable) => void>,
       },
     },
@@ -97,6 +113,7 @@
     setup(props, { emit }) {
       const { prefixCls } = useDesign('header-notify-list');
       const current = ref(props.currentPage || 1);
+
       const getData = computed(() => {
         const { pageSize, list } = props;
         if (pageSize === false) return [];
@@ -109,14 +126,12 @@
           current.value = v;
         },
       );
-      const isTitleClickable = computed(() => !!props.onTitleClick);
       const getPagination = computed(() => {
         const { list, pageSize } = props;
         if (pageSize > 0 && list && list.length > pageSize) {
           return {
             total: list.length,
             pageSize,
-            //size: 'small',
             current: unref(current),
             onChange(page) {
               current.value = page;
@@ -128,11 +143,20 @@
         }
       });
 
-      function handleTitleClick(item: ListItem) {
-        props.onTitleClick && props.onTitleClick(item);
+      function handleNoticyClick(item: NoticyItem) {
+        props.onNoticyClick && props.onNoticyClick(item);
       }
-
-      return { prefixCls, getPagination, getData, handleTitleClick, isTitleClickable };
+      /* 删除 */
+      async function handleDelete(item: NoticyItem) {
+        props.onNoticyClick && props.onNoticyClick(item);
+      }
+      return {
+        prefixCls,
+        getPagination,
+        getData,
+        handleNoticyClick,
+        handleDelete,
+      };
     },
   });
 </script>
@@ -140,6 +164,8 @@
   @prefix-cls: ~'@{namespace}-header-notify-list';
 
   .@{prefix-cls} {
+    min-width: 280px;
+
     &::-webkit-scrollbar {
       display: none;
     }
@@ -148,15 +174,18 @@
       display: inline-block !important;
     }
 
-    &-item {
-      padding: 6px;
+    .list-item {
+      padding: 10px;
       overflow: hidden;
       cursor: pointer;
       transition: all 0.3s;
 
+      .ant-list-item-meta {
+        align-items: center;
+      }
+
       .title {
-        margin-bottom: 8px;
-        font-weight: normal;
+        font-weight: bold;
 
         .extra {
           float: right;
@@ -177,13 +206,14 @@
           font-size: 12px;
           line-height: 18px;
         }
-
-        .datetime {
-          margin-top: 4px;
-          font-size: 12px;
-          line-height: 18px;
-        }
       }
     }
+  }
+
+  .datetime {
+    margin-top: 4px;
+    font-size: 12px;
+    line-height: 18px;
+    color: #7f838b;
   }
 </style>

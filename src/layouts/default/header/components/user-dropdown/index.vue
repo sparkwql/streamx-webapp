@@ -4,7 +4,7 @@
       <img :class="`${prefixCls}__header`" :src="getUserInfo.avatar" />
       <span :class="`${prefixCls}__info hidden md:block`">
         <span :class="`${prefixCls}__name  `" class="truncate">
-          {{ getUserInfo.realName }}
+          {{ getUserInfo.username }}
         </span>
       </span>
     </span>
@@ -49,7 +49,7 @@
   import { useDesign } from '/@/hooks/web/useDesign';
   import { useModal } from '/@/components/Modal';
 
-  import headerImg from '/@/assets/images/header.jpg';
+  import headerImg from '/@/assets/svg/default-avator.svg';
   import { propTypes } from '/@/utils/propTypes';
   import { openWindow } from '/@/utils';
 
@@ -76,8 +76,8 @@
       const userStore = useUserStore();
 
       const getUserInfo = computed(() => {
-        const { realName = '', avatar, desc } = userStore.getUserInfo || {};
-        return { realName, avatar: avatar || headerImg, desc };
+        const { username = '', avatar, desc } = userStore.getUserInfo || {};
+        return { username, avatar: avatar || headerImg, desc };
       });
 
       const [register, { openModal }] = useModal();
@@ -135,8 +135,8 @@
     align-items: center;
 
     img {
-      width: 24px;
-      height: 24px;
+      width: 30px;
+      height: 30px;
       margin-right: 12px;
     }
 
