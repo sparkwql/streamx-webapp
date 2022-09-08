@@ -16,6 +16,7 @@ enum Api {
   UserAdd = '/user/post',
   UserDelete = '/user/delete',
   ResetPassword = '/user/password/reset',
+  Password = '/user/password',
   CheckName = '/user/check/name',
 }
 
@@ -116,6 +117,20 @@ export function checkUserName(params) {
   return defHttp.post({
     url: Api.CheckName,
     data: params,
+    headers: {
+      'Content-Type': ContentTypeEnum.FORM_URLENCODED,
+    },
+  });
+}
+/**
+ * 用户修改密码
+ * @param{String} username 用户名
+ * @param{String} password 密码
+ */
+export function fetchUserPasswordUpdate(params: { username: string; password: string }) {
+  return defHttp.put<boolean>({
+    url: Api.Password,
+    params,
     headers: {
       'Content-Type': ContentTypeEnum.FORM_URLENCODED,
     },

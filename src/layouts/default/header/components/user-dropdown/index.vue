@@ -12,6 +12,11 @@
     <template #overlay>
       <Menu @click="handleMenuClick">
         <MenuItem
+          key="password"
+          :text="t('layout.header.ChangePassword')"
+          icon="ant-design:setting-outlined"
+        />
+        <MenuItem
           key="doc"
           :text="t('layout.header.dropdownItemDoc')"
           icon="ion:document-text-outline"
@@ -33,6 +38,7 @@
     </template>
   </Dropdown>
   <LockAction @register="register" />
+  <PasswordModal @register="registerPasswordModal" />
 </template>
 <script lang="ts">
   // components
@@ -54,8 +60,7 @@
   import { openWindow } from '/@/utils';
 
   import { createAsyncComponent } from '/@/utils/factory/createAsyncComponent';
-
-  type MenuEvent = 'logout' | 'doc' | 'lock';
+  type MenuEvent = 'logout' | 'doc' | 'password' | 'lock';
 
   export default defineComponent({
     name: 'UserDropdown',
@@ -65,6 +70,7 @@
       MenuItem: createAsyncComponent(() => import('./DropMenuItem.vue')),
       MenuDivider: Menu.Divider,
       LockAction: createAsyncComponent(() => import('../lock/LockModal.vue')),
+      PasswordModal: createAsyncComponent(() => import('./PasswordModal.vue')),
     },
     props: {
       theme: propTypes.oneOf(['dark', 'light']),
@@ -79,7 +85,7 @@
         const { username = '', avatar, desc } = userStore.getUserInfo || {};
         return { username, avatar: avatar || headerImg, desc };
       });
-
+      const [registerPasswordModal, { openModal: openPasswordModal }] = useModal();
       const [register, { openModal }] = useModal();
 
       function handleLock() {
@@ -95,6 +101,10 @@
       function openDoc() {
         openWindow(DOC_URL);
       }
+      /* change password */
+      function openChangePassword() {
+        openPasswordModal(true);
+      }
 
       function handleMenuClick(e: MenuInfo) {
         switch (e.key as MenuEvent) {
@@ -103,6 +113,8 @@
             break;
           case 'doc':
             openDoc();
+          case 'password':
+            openChangePassword();
             break;
           case 'lock':
             handleLock();
@@ -118,6 +130,7 @@
         getShowDoc,
         register,
         getUseLockPage,
+        registerPasswordModal,
       };
     },
   });
