@@ -17,6 +17,8 @@
         :sider="false"
       />
       <LayoutBreadcrumb v-if="getShowContent && getShowBread" :theme="getHeaderTheme" />
+      <!-- slogan -->
+      <Slogan class="hidden lg:block" />
     </div>
     <!-- left end -->
 
@@ -33,6 +35,16 @@
 
     <!-- action  -->
     <div :class="`${prefixCls}-action`">
+      <a-button type="link" size="small" class="!hidden !md:block">
+        <span>Version:</span>
+        <span class="pl-2px">{{ version }}</span>
+      </a-button>
+      <Divider type="vertical" />
+      <!-- Theme Switch -->
+      <appDarkModeToggle />
+      <!-- Github info -->
+      <Github :class="`${prefixCls}-action__item github-item`" />
+
       <AppSearch :class="`${prefixCls}-action__item `" v-if="getShowSearch" />
 
       <ErrorAction v-if="getUseErrorHandle" :class="`${prefixCls}-action__item error-action`" />
@@ -58,13 +70,13 @@
   import { defineComponent, unref, computed } from 'vue';
 
   import { propTypes } from '/@/utils/propTypes';
-
-  import { Layout } from 'ant-design-vue';
+  import { Layout, Divider } from 'ant-design-vue';
   import { AppLogo } from '/@/components/Application';
   import LayoutMenu from '../menu/index.vue';
   import LayoutTrigger from '../trigger/index.vue';
 
   import { AppSearch } from '/@/components/Application';
+  import { AppDarkModeToggle } from '/@/components/Application';
 
   import { useHeaderSetting } from '/@/hooks/setting/useHeaderSetting';
   import { useMenuSetting } from '/@/hooks/setting/useMenuSetting';
@@ -74,13 +86,21 @@
   import { SettingButtonPositionEnum } from '/@/enums/appEnum';
   import { AppLocalePicker } from '/@/components/Application';
 
-  import { UserDropDown, LayoutBreadcrumb, FullScreen, Notify, ErrorAction } from './components';
+  import {
+    UserDropDown,
+    LayoutBreadcrumb,
+    FullScreen,
+    Notify,
+    ErrorAction,
+    Github,
+    Slogan,
+  } from './components';
   import { useAppInject } from '/@/hooks/web/useAppInject';
   import { useDesign } from '/@/hooks/web/useDesign';
 
   import { createAsyncComponent } from '/@/utils/factory/createAsyncComponent';
   import { useLocale } from '/@/locales/useLocale';
-
+  import { version } from '../../../../package.json';
   export default defineComponent({
     name: 'LayoutHeader',
     components: {
@@ -95,6 +115,10 @@
       Notify,
       AppSearch,
       ErrorAction,
+      Github,
+      Slogan,
+      Divider,
+      AppDarkModeToggle,
       SettingDrawer: createAsyncComponent(() => import('/@/layouts/default/setting/index.vue'), {
         loading: true,
       }),
@@ -192,10 +216,11 @@
         getShowSettingButton,
         getShowSetting,
         getShowSearch,
+        version,
       };
     },
   });
 </script>
 <style lang="less">
-  @import './index.less';
+  @import url('./index.less');
 </style>

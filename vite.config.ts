@@ -18,7 +18,7 @@ const __APP_INFO__ = {
   pkg: { dependencies, devDependencies, name, version },
   lastBuildTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
 };
-
+const prefix = 'monaco-editor/esm/vs';
 export default ({ command, mode }: ConfigEnv): UserConfig => {
   const root = process.cwd();
 
@@ -81,6 +81,18 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       // Turning off brotliSize display can slightly reduce packaging time
       brotliSize: false,
       chunkSizeWarningLimit: 2000,
+      // monaco editor
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            jsonWorker: ['${prefix}/languages/json/json.worker'],
+            cssWorker: ['${prefix}/languages/css/css.worker'],
+            htmlWorker: ['${prefix}/languages/html/html.worker'],
+            tsWorker: [`${prefix}/language/typescript/ts.worker`],
+            editorWorker: [`${prefix}/editor/editor.worker`],
+          },
+        },
+      },
     },
     define: {
       // setting vue-i18-next

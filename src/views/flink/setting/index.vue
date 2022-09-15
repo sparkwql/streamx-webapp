@@ -33,8 +33,8 @@
         </a-card>
       </a-col>
     </a-row>
-  </PageWrapper></template
->
+  </PageWrapper>
+</template>
 <script lang="ts">
   import { defineComponent } from 'vue';
   import { PageWrapper } from '/@/components/Page';
