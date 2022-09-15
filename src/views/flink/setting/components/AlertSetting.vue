@@ -1,3 +1,10 @@
+<script lang="ts">
+  import { defineComponent } from 'vue';
+
+  export default defineComponent({
+    name: 'AlertSetting',
+  });
+</script>
 <script setup lang="ts" name="AlertSetting">
   import { h, onMounted, ref } from 'vue';
   import { List, Popconfirm, Tooltip } from 'ant-design-vue';
@@ -20,7 +27,6 @@
   const { createMessage, createConfirm } = useMessage();
   const [registerAlertModal, { openModal: openAlertModal }] = useModal();
   const alerts = ref<AlertSetting[]>([]);
-  const alertId = ref('');
   const alertType = ref<number[]>([]);
   /* 获取告警配置 */
   async function getAlertSetting() {
@@ -44,6 +50,7 @@
   }
   /* 测试连接 */
   async function handleTestAlarm(item) {
+    const hide = createMessage.loading(' Testing', 0);
     try {
       await fetchSendAlert({ id: item.id });
       createMessage.success('Test Alert Config  successful!');
@@ -59,12 +66,12 @@
       } else {
         console.error(error);
       }
+    } finally {
+      hide();
     }
   }
   /* 点击编辑按扭 */
   function handleEditAlertConf(item: AlertSetting) {
-    alertId.value = item.id;
-    openAlertModal(true);
     alertType.value = computeAlertType(item.alertType);
 
     let emailParams: Recordable<any> = {};
@@ -90,6 +97,7 @@
 
     console.log('告警参数：' + JSON.stringify(item));
     openAlertModal(true, {
+      alertId: item.id,
       alertName: item.alertName,
       alertType: alertType.value,
       alertEmail: emailParams.contacts,
@@ -193,5 +201,5 @@
       </template>
     </ListItem>
   </List>
-  <AlertModal @register="registerAlertModal" :alertId="alertId" width="850px" />
+  <AlertModal @register="registerAlertModal" @reload="getAlertSetting" width="850px" />
 </template>

@@ -12,8 +12,16 @@
             <AlertSetting />
           </Card>
         </TabPane>
-        <TabPane tab="Flink Home" key="flink" />
-        <TabPane tab="Flink Cluster" key="cluster" />
+        <TabPane tab="Flink Home" key="flink">
+          <Card :bordered="false" class="system-setting">
+            <FlinkEnvSetting />
+          </Card>
+        </TabPane>
+        <TabPane tab="Flink Cluster" key="cluster">
+          <Card :bordered="false" class="system-setting">
+            <FlinkClusterSetting />
+          </Card>
+        </TabPane>
       </Tabs>
     </div>
   </PageWrapper>
@@ -24,6 +32,8 @@
   import { PageWrapper } from '/@/components/Page';
   import SystemSetting from './components/SystemSetting.vue';
   import AlertSetting from './components/AlertSetting.vue';
+  import FlinkEnvSetting from './components/FlinkEnvSetting.vue';
+  import FlinkClusterSetting from './components/FlinkClusterSetting.vue';
 
   const TabPane = Tabs.TabPane;
   const activeKey = ref('system');

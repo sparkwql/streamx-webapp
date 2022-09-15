@@ -1,4 +1,4 @@
-import { AlertSetting } from './types/alert.type';
+import { AlertCreate, AlertSetting } from './types/alert.type';
 import { ContentTypeEnum } from '/@/enums/httpEnum';
 import { defHttp } from '/@/utils/http/axios';
 
@@ -56,9 +56,32 @@ export function fetchAlertDelete(params: { id: string }) {
  * 告警名称测试
  * @returns Promise<boolean>
  */
-export function fetchExistsAlert(params: { alertName: string; isJsonType: boolean }) {
+export function fetchExistsAlert(params: { alertName: string; isJsonType?: boolean }) {
   return defHttp.post<boolean>({
     url: ALERT_APi.EXISTS,
+    params,
+  });
+}
+
+/**
+ * 添加告警设置
+ * @param {AlertCreate} params
+ * @returns Promise<boolean>
+ */
+export function fetchAlertAdd(params: AlertCreate) {
+  return defHttp.post<boolean>({
+    url: ALERT_APi.ADD,
+    params,
+  });
+}
+/**
+ * 更新告警设置
+ * @param {AlertCreate} params
+ * @returns Promise<boolean>
+ */
+export function fetchAlertUpdate(params: AlertCreate) {
+  return defHttp.post<boolean>({
+    url: ALERT_APi.UPDATE,
     params,
   });
 }
