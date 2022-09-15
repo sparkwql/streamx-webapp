@@ -21,6 +21,23 @@ export function useMonaco(target: Ref, options: EditorOption) {
     if (editor) editor.setValue(content);
   };
 
+  const getContent = async () => {
+    await until(isSetup).toBeTruthy();
+    if (editor) {
+      return editor.getValue();
+    } else {
+      return '';
+    }
+  };
+  const getInstance = async () => {
+    await until(isSetup).toBeTruthy();
+    if (editor) {
+      return editor;
+    } else {
+      return null;
+    }
+  };
+
   const init = async () => {
     const { monaco } = await setupMonaco();
     watch(
@@ -75,5 +92,7 @@ export function useMonaco(target: Ref, options: EditorOption) {
   return {
     onChange: changeEventHook.on,
     setContent,
+    getContent,
+    getInstance,
   };
 }
