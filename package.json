@@ -61,6 +61,7 @@
     "qrcode": "^1.5.0",
     "qs": "^6.10.3",
     "resize-observer-polyfill": "^1.5.1",
+    "sql-formatter": "^4.0.2",
     "showdown": "^2.1.0",
     "sortablejs": "^1.15.0",
     "sweetalert2": "^11.4.18",

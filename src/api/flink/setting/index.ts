@@ -35,3 +35,15 @@ export function fetchSystemSettingUpdate(params: { settingKey: string; settingVa
     },
   });
 }
+/**
+ * 检查配置
+ * @returns Promise<boolean>
+ */
+export function fetchCheckHadoop() {
+  return defHttp.post<boolean>({
+    url: SETTING_APi.CHECK_HADOOP,
+    headers: {
+      'Content-Type': ContentTypeEnum.FORM_URLENCODED,
+    },
+  });
+}

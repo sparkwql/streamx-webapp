@@ -75,7 +75,7 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[less]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "michelemelluso.code-beautifier"
   },
   "[scss]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"

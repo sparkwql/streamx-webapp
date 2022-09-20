@@ -18,7 +18,7 @@
               <template #icon v-if="item.popConfirm.icon">
                 <Icon :icon="item.popConfirm.icon" />
               </template>
-              <div>
+              <div :class="getClass(item)">
                 <Icon :icon="item.icon" v-if="item.icon" />
                 <span class="ml-1">{{ item.text }}</span>
               </div>
@@ -93,4 +93,31 @@
   });
 
   const getAttr = (key: string | number) => ({ key });
+
+  const getClass = (record) => {
+    const { color, disabled } = record;
+    return [
+      {
+        [`dropdown-text-${color}`]: !!color,
+        [`is-disabled`]: !!disabled,
+      },
+    ];
+  };
 </script>
+<style lang="less">
+  .dropdown-text-error {
+    color: @error-color;
+  }
+
+  .dropdown-text-primary {
+    color: @primary-color;
+  }
+
+  .dropdown-success {
+    color: @success-color;
+  }
+
+  .dropdown-warn {
+    color: @warning-color;
+  }
+</style>
