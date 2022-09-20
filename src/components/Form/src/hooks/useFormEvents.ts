@@ -146,9 +146,7 @@ export function useFormEvents({
    */
   async function appendSchemaByField(schema: FormSchema, prefixField?: string, first = false) {
     const schemaList: FormSchema[] = cloneDeep(unref(getSchema));
-
     const index = schemaList.findIndex((schema) => schema.field === prefixField);
-
     if (!prefixField || index === -1 || first) {
       first ? schemaList.unshift(schema) : schemaList.push(schema);
       schemaRef.value = schemaList;
@@ -161,6 +159,7 @@ export function useFormEvents({
     _setDefaultValue(schema);
 
     schemaRef.value = schemaList;
+    console.log('index2', schemaRef);
   }
 
   async function resetSchema(data: Partial<FormSchema> | Partial<FormSchema>[]) {
@@ -293,7 +292,8 @@ export function useFormEvents({
       const res = handleFormValues(values);
       emit('submit', res);
     } catch (error: any) {
-      throw new Error(error);
+      // throw new Error(error);
+      console.error(error);
     }
   }
 

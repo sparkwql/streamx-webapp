@@ -78,3 +78,16 @@ export function fetchClusterShutdown(id: string) {
     },
   );
 }
+/**
+ * flink cluster shutdown
+ * @returns Promise<AxiosResponse>
+ */
+export function fetchActiveURL(id: string) {
+  return defHttp.post<string>({
+    url: FLINK_API.ACTIVE_URL,
+    params: { id },
+    headers: {
+      'Content-Type': ContentTypeEnum.FORM_URLENCODED,
+    },
+  });
+}

@@ -5,24 +5,55 @@ import type { editor as Editor } from 'monaco-editor';
 import setupMonaco from '/@/monaco';
 import { useDark } from '@vueuse/core';
 export const isDark = useDark();
-interface EditorOption {
+export interface MonacoEditorOption {
   code?: any;
   language: string;
   options?: Editor.IStandaloneEditorConstructionOptions;
 }
 
-export function useMonaco(target: Ref, options: EditorOption) {
+export function useMonaco(target: Ref, options: MonacoEditorOption) {
   const changeEventHook = createEventHook<string>();
   const isSetup = ref(false);
   let editor: Editor.IStandaloneCodeEditor;
+  let monacoInstance: any;
 
   const setContent = async (content: string) => {
     await until(isSetup).toBeTruthy();
     if (editor) editor.setValue(content);
   };
 
+  const getContent = async () => {
+    await until(isSetup).toBeTruthy();
+    if (editor) {
+      return editor.getValue();
+    } else {
+      return '';
+    }
+  };
+  const getInstance = async () => {
+    await until(isSetup).toBeTruthy();
+    if (editor) {
+      return editor;
+    } else {
+      return null;
+    }
+  };
+  const getMonacoInstance = async () => {
+    await until(isSetup).toBeTruthy();
+    if (monacoInstance) {
+      return monacoInstance;
+    } else {
+      return null;
+    }
+  };
+
+  const disposeInstance = async () => {
+    editor?.dispose();
+  };
+
   const init = async () => {
     const { monaco } = await setupMonaco();
+    monacoInstance = monaco;
     watch(
       target,
       () => {
@@ -34,6 +65,7 @@ export function useMonaco(target: Ref, options: EditorOption) {
         const model = monaco.editor.createModel(options.code, options.language);
         const defaultOptions = {
           model,
+          language: options.language,
           tabSize: 2,
           insertSpaces: true,
           autoClosingQuotes: 'always',
@@ -75,5 +107,9 @@ export function useMonaco(target: Ref, options: EditorOption) {
   return {
     onChange: changeEventHook.on,
     setContent,
+    getContent,
+    getInstance,
+    getMonacoInstance,
+    disposeInstance,
   };
 }

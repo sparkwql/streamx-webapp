@@ -43,6 +43,7 @@ componentMap.set('InputNumber', InputNumber);
 componentMap.set('AutoComplete', AutoComplete);
 
 componentMap.set('Select', Select);
+componentMap.set('SelectGroup', Select.Group);
 componentMap.set('ApiSelect', ApiSelect);
 componentMap.set('ApiTree', ApiTree);
 componentMap.set('TreeSelect', TreeSelect);
