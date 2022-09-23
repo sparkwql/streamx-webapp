@@ -1,165 +1,220 @@
-import { BasicColumn, FormSchema } from '/@/components/Table';
-import { h } from 'vue';
-import { Tag } from 'ant-design-vue';
-import { getRoleListByUser } from '/@/api/sys/role';
-import { getTeamListByUser } from '/@/api/sys/team';
+import { FormSchema } from '/@/components/Form';
+import { branches, isExist } from '/@/api/flink/project';
 
-// user status enum
-const enum StatusEnum {
-  Effective = '1',
-  Locked = '0',
+export const enum BuildStatusEnum {
+  All = ' ',
+  NotBuild = '-1',
+  Building = '0',
+  BuildSuccess = '1',
+  BuildFail = '2',
+  NeedBuild = '-2',
 }
 
-export const columns: BasicColumn[] = [
+interface Status {
+  label?: string;
+  key?: string;
+}
+
+export const statusList: Status[] = [
   {
-    title: 'User Name',
-    dataIndex: 'username',
-    width: 200,
-    align: 'left',
-    sorter: true,
+    label: 'All',
+    key: BuildStatusEnum.All,
   },
   {
-    title: 'Nick Name',
-    dataIndex: 'nickName',
+    label: 'Not Build',
+    key: BuildStatusEnum.NotBuild,
   },
   {
-    title: 'Team',
-    dataIndex: 'teamName',
-    width: 180,
+    label: 'Building',
+    key: BuildStatusEnum.Building,
   },
   {
-    title: 'Status',
-    dataIndex: 'status',
-    customRender: ({ record }) => {
-      const enable = record?.status === StatusEnum.Effective;
-      const color = enable ? 'green' : 'red';
-      const text = enable ? 'Effective' : 'locked';
-      return h(Tag, { color }, () => text);
-    },
+    label: 'Build Success',
+    key: BuildStatusEnum.BuildSuccess,
   },
   {
-    title: 'Create Time',
-    dataIndex: 'createTime',
-    width: 180,
-    sorter: true,
+    label: 'Build Failed',
+    key: BuildStatusEnum.BuildFail,
   },
 ];
 
-export const searchFormSchema: FormSchema[] = [
-  {
-    label: 'Team',
-    field: 'teamId',
-    component: 'ApiSelect',
-    componentProps: {
-      api: getTeamListByUser,
-      resultField: 'records',
-      labelField: 'teamName',
-      valueField: 'teamId',
-    },
-    colProps: { span: 8 },
+export const buildStateMap = {
+  [BuildStatusEnum.NotBuild]: {
+    color: '#C0C0C0',
+    label: 'NOT BUILD',
   },
-  {
-    field: 'username',
-    label: 'User Name',
-    component: 'Input',
-    colProps: { span: 8 },
+  [BuildStatusEnum.NeedBuild]: {
+    color: '#FFA500',
+    label: 'NEED REBUILD',
   },
-];
-
-export const formSchema = (isUpdate = false): FormSchema[] => {
-  return [
-    {
-      field: 'userId',
-      label: 'User Id',
-      component: 'Input',
-      show: false,
-    },
-    {
-      field: 'username',
-      label: 'User Name',
-      component: 'Input',
-      required: !isUpdate,
-
-      componentProps: {
-        readonly: isUpdate,
-      },
-    },
-    {
-      field: 'nickName',
-      label: 'Nick Name',
-      component: 'Input',
-      required: !isUpdate,
-      componentProps: {
-        readonly: isUpdate,
-      },
-    },
-    {
-      field: 'password',
-      label: 'Password',
-      component: 'InputPassword',
-      required: true,
-      ifShow: !isUpdate,
-    },
-    {
-      field: 'email',
-      label: 'E-Mail',
-      component: 'Input',
-      componentProps: {
-        placeholder: 'input email',
-      },
-    },
-    {
-      label: 'Role',
-      field: 'roleId',
-      component: 'ApiSelect',
-      componentProps: {
-        api: getRoleListByUser,
-        resultField: 'records',
-        labelField: 'roleName',
-        valueField: 'roleId',
-        mode: 'multiple',
-      },
-      required: true,
-    },
-    {
-      label: 'Team',
-      field: 'teamId',
-      component: 'ApiSelect',
-      componentProps: {
-        api: getTeamListByUser,
-        resultField: 'records',
-        labelField: 'teamName',
-        valueField: 'teamId',
-      },
-      required: true,
-      show: !isUpdate,
-    },
-    {
-      field: 'status',
-      label: 'Status',
-      component: 'RadioGroup',
-      defaultValue: '0',
-      componentProps: {
-        options: [
-          { label: 'locked', value: StatusEnum.Locked },
-          { label: 'effective', value: StatusEnum.Effective },
-        ],
-      },
-      required: true,
-    },
-    {
-      field: 'sex',
-      label: 'Gender',
-      component: 'RadioGroup',
-      defaultValue: '0',
-      componentProps: {
-        options: [
-          { label: 'male', value: '0' },
-          { label: 'female', value: '1' },
-          { label: 'secret', value: '2' },
-        ],
-      },
-      required: true,
-    },
-  ];
+  [BuildStatusEnum.Building]: {
+    color: '#1AB58E',
+    label: 'BUILDING',
+    className: 'status-processing-building',
+  },
+  [BuildStatusEnum.BuildSuccess]: {
+    color: '#52c41a',
+    label: 'SUCCESSFUL',
+  },
+  [BuildStatusEnum.BuildFail]: {
+    color: '#f5222d',
+    label: 'FAILED',
+  },
 };
+
+export enum ProjectType {
+  Flink = 1,
+  Spark = 2,
+}
+
+export const formSchema: FormSchema[] = [
+  {
+    field: 'id',
+    label: 'id',
+    component: 'Input',
+    show: false,
+  },
+  {
+    field: 'name',
+    label: 'Project Name',
+    component: 'Input',
+    rules: [
+      {
+        validator: async (_, value) => {
+          if (!value) {
+            return Promise.reject('The Project Name is required');
+          }
+          const res = await isExist({ name: value });
+          if (!res) {
+            return Promise.reject(`The Project Name is already exists. Please check`);
+          }
+        },
+        trigger: 'blur',
+      },
+    ],
+    componentProps: {
+      placeholder: 'the project name',
+    },
+  },
+  {
+    field: 'type',
+    label: 'Project Type',
+    component: 'Select',
+    required: true,
+    defaultValue: 1,
+    componentProps: {
+      options: [
+        {
+          label: 'apache flink',
+          value: 1,
+          key: '1',
+        },
+        {
+          label: 'apache spark',
+          value: 2,
+          key: '2',
+        },
+      ],
+      placeholder: 'the project type',
+    },
+  },
+  {
+    field: 'repository',
+    label: 'CVS',
+    component: 'Input',
+    rules: [
+      {
+        required: true,
+        message: 'CVS is required',
+      },
+    ],
+    componentProps: {
+      options: [
+        {
+          label: 'GitHub/GitLab',
+          value: 1,
+          key: '1',
+        },
+        {
+          label: 'Subversion',
+          value: 2,
+          key: '2',
+        },
+      ],
+      placeholder: 'CVS',
+    },
+  },
+  {
+    field: 'url',
+    label: 'Repository URL',
+    component: 'Input',
+    required: true,
+    componentProps: {
+      placeholder: 'The Repository URL for this project',
+    },
+  },
+  {
+    field: 'userName',
+    label: 'UserName',
+    component: 'Input',
+    dynamicRules: ({ values }) => {
+      return values.password ? [{ required: true, message: 'Password is required' }] : [];
+    },
+    componentProps: {
+      placeholder: 'UserName for this project',
+    },
+  },
+  {
+    field: 'password',
+    label: 'Password',
+    component: 'InputPassword',
+    dynamicRules: ({ values }) => {
+      return values.userName ? [{ required: true, message: 'UserName is required' }] : [];
+    },
+    componentProps: {
+      placeholder: 'Password for this project',
+    },
+  },
+  {
+    field: 'branches',
+    label: 'Branches',
+    component: 'ApiSelect',
+    required: true,
+    componentProps: ({ formModel }) => {
+      return {
+        api: branches,
+        params: {
+          userName: formModel.userName,
+          password: formModel.password,
+          url: formModel.url,
+        },
+        placeholder: 'Select a branch',
+      };
+    },
+  },
+  {
+    field: 'pom',
+    label: 'POM',
+    component: 'Input',
+    componentProps: {
+      placeholder:
+        'By default,lookup pom.xml in root path,You can manually specify the module to compile pom.xml"',
+    },
+  },
+  {
+    field: 'buildArgs',
+    label: 'Build Argument',
+    component: 'InputTextArea',
+    componentProps: {
+      placeholder: 'Build Argument, e.g: -Pprod',
+    },
+  },
+  {
+    field: 'description',
+    label: 'description',
+    component: 'InputTextArea',
+    componentProps: {
+      placeholder: 'Description for this project',
+    },
+  },
+];

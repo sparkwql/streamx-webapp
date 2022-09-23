@@ -16,7 +16,7 @@ const streamxConsole: AppRouteModule = {
     {
       path: 'project',
       name: 'FlinkProject',
-      component: () => import('/@/views/flink/project/Project.vue'),
+      component: () => import('/@/views/flink/project/View.vue'),
       meta: {
         icon: 'arcticons:projectm',
         title: 'Project',

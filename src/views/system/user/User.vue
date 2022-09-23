@@ -69,6 +69,7 @@
         formConfig: {
           labelWidth: 120,
           schemas: searchFormSchema,
+          fieldMapToTime: [['createTime', ['createTimeFrom', 'createTimeTo'], 'YYYY-MM']],
         },
         rowKey: 'userId',
         isTreeTable: true,

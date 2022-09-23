@@ -2,7 +2,7 @@
   import { Collapse } from 'ant-design-vue';
   import { ref, onMounted, computed } from 'vue';
   import { fetchSystemSetting } from '/@/api/flink/setting';
-  import { SystemSetting } from '/@/api/flink/types/settingType';
+  import { SystemSetting } from '/@/api/flink/setting/types/setting.type';
   import SettingList from './SettingList.vue';
   import { fetchSystemSettingUpdate } from '/@/api/flink/setting/alert';
   import { useMessage } from '/@/hooks/web/useMessage';

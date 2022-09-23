@@ -56,21 +56,15 @@ export const columns: BasicColumn[] = [
 
 export const searchFormSchema: FormSchema[] = [
   {
-    label: 'Team',
-    field: 'teamId',
-    component: 'ApiSelect',
-    componentProps: {
-      api: getTeamListByUser,
-      resultField: 'records',
-      labelField: 'teamName',
-      valueField: 'teamId',
-    },
-    colProps: { span: 8 },
-  },
-  {
     field: 'username',
     label: 'User Name',
     component: 'Input',
+    colProps: { span: 8 },
+  },
+  {
+    label: 'Create Time',
+    field: 'createTime',
+    component: 'RangePicker',
     colProps: { span: 8 },
   },
 ];

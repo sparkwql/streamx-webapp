@@ -46,6 +46,7 @@
         formConfig: {
           labelWidth: 120,
           schemas: searchFormSchema,
+          fieldMapToTime: [['createTime', ['createTimeFrom', 'createTimeTo'], 'YYYY-MM-DD']],
         },
         rowKey: 'teamId',
         isTreeTable: true,
